@@ -82,8 +82,33 @@ def detect_garment_anchor_points(
     # Detect key points based on garment geometry
     anchors = {}
     
+    # Set region boundaries based on garment type
+    gtype = (garment_type or "upper_body").lower()
+    
+    # Defaults (t-shirt, shirt, upper_body)
+    shoulder_y_max_pct = 0.3
+    waist_y_min_pct = 0.4
+    waist_y_max_pct = 0.65
+    hem_y_min_pct = 0.75
+    hem_bottom_min_pct = 0.8
+    neckline_y_max_pct = 0.2
+    
+    if gtype == "dress":
+        # Dress implies a longer silhouette
+        waist_y_min_pct = 0.3
+        waist_y_max_pct = 0.45
+        hem_y_min_pct = 0.85
+        hem_bottom_min_pct = 0.9
+    elif gtype in ["jacket", "coat", "outerwear"]:
+        # Jackets might feature deeper neckline, lower waist/hem
+        neckline_y_max_pct = 0.25
+        waist_y_min_pct = 0.5
+        waist_y_max_pct = 0.7
+        hem_y_min_pct = 0.8
+        hem_bottom_min_pct = 0.85
+    
     # Top center (neckline) - highest point near center
-    top_points = contour[contour[:, 0, 1] < (y + h * 0.2)]
+    top_points = contour[contour[:, 0, 1] < (y + h * neckline_y_max_pct)]
     if len(top_points) > 0:
         # Find point closest to horizontal center
         center_x = x + w // 2
@@ -96,7 +121,7 @@ def detect_garment_anchor_points(
     # Left shoulder - top left corner area
     left_region = contour[
         (contour[:, 0, 0] < (x + w * 0.4)) &
-        (contour[:, 0, 1] < (y + h * 0.3))
+        (contour[:, 0, 1] < (y + h * shoulder_y_max_pct))
     ]
     if len(left_region) > 0:
         # Leftmost point in top-left region
@@ -108,7 +133,7 @@ def detect_garment_anchor_points(
     # Right shoulder - top right corner area
     right_region = contour[
         (contour[:, 0, 0] > (x + w * 0.6)) &
-        (contour[:, 0, 1] < (y + h * 0.3))
+        (contour[:, 0, 1] < (y + h * shoulder_y_max_pct))
     ]
     if len(right_region) > 0:
         # Rightmost point in top-right region
@@ -118,7 +143,7 @@ def detect_garment_anchor_points(
         anchors['right_shoulder'] = (x + w, y + int(h * 0.15))
     
     # Bottom hem — lowest center point
-    bottom_points = contour[contour[:, 0, 1] > (y + h * 0.8)]
+    bottom_points = contour[contour[:, 0, 1] > (y + h * hem_bottom_min_pct)]
     if len(bottom_points) > 0:
         center_x = x + w // 2
         bottom_center_idx = np.argmin(np.abs(bottom_points[:, 0, 0] - center_x))
@@ -128,21 +153,21 @@ def detect_garment_anchor_points(
     
     # Extended anchors for TPS warping (waist and hem corners)
     
-    # Left waist — left side at ~50% height
+    # Left waist
     waist_region_left = contour[
         (contour[:, 0, 0] < (x + w * 0.4)) &
-        (contour[:, 0, 1] > (y + h * 0.4)) &
-        (contour[:, 0, 1] < (y + h * 0.65))
+        (contour[:, 0, 1] > (y + h * waist_y_min_pct)) &
+        (contour[:, 0, 1] < (y + h * waist_y_max_pct))
     ]
     if len(waist_region_left) > 0:
         left_idx = np.argmin(waist_region_left[:, 0, 0])
         anchors['left_waist'] = tuple(waist_region_left[left_idx, 0])
     
-    # Right waist — right side at ~50% height
+    # Right waist
     waist_region_right = contour[
         (contour[:, 0, 0] > (x + w * 0.6)) &
-        (contour[:, 0, 1] > (y + h * 0.4)) &
-        (contour[:, 0, 1] < (y + h * 0.65))
+        (contour[:, 0, 1] > (y + h * waist_y_min_pct)) &
+        (contour[:, 0, 1] < (y + h * waist_y_max_pct))
     ]
     if len(waist_region_right) > 0:
         right_idx = np.argmax(waist_region_right[:, 0, 0])
@@ -151,7 +176,7 @@ def detect_garment_anchor_points(
     # Left hem — bottom-left corner
     hem_region_left = contour[
         (contour[:, 0, 0] < (x + w * 0.4)) &
-        (contour[:, 0, 1] > (y + h * 0.75))
+        (contour[:, 0, 1] > (y + h * hem_y_min_pct))
     ]
     if len(hem_region_left) > 0:
         left_idx = np.argmin(hem_region_left[:, 0, 0])
@@ -160,7 +185,7 @@ def detect_garment_anchor_points(
     # Right hem — bottom-right corner
     hem_region_right = contour[
         (contour[:, 0, 0] > (x + w * 0.6)) &
-        (contour[:, 0, 1] > (y + h * 0.75))
+        (contour[:, 0, 1] > (y + h * hem_y_min_pct))
     ]
     if len(hem_region_right) > 0:
         right_idx = np.argmax(hem_region_right[:, 0, 0])
