@@ -3,9 +3,9 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
 from pathlib import Path
 
-# Use the same dev.db as Prisma (located in src/backend/prisma/)
-_project_root = Path(__file__).resolve().parent.parent.parent  # ai-service -> project root
-DB_PATH = _project_root / "src" / "backend" / "prisma" / "dev.db"
+# Store the database locally in the modern structure
+_project_root = Path(__file__).resolve().parent.parent
+DB_PATH = _project_root / "storage" / "dev.db"
 
 SQLALCHEMY_DATABASE_URL = f"sqlite:///{DB_PATH}"
 
