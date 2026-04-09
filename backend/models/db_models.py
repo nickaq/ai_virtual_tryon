@@ -1,6 +1,6 @@
 """
 SQLAlchemy ORM models.
-Mirrors the Prisma schema but without a User table (auth is handled by Next.js).
+Defines Product, Order, Upload, and TryOnJob tables for the shop and AI layers.
 """
 from sqlalchemy import (
     Column, String, Float, Boolean, Integer, DateTime, Text, ForeignKey
@@ -39,7 +39,7 @@ class Order(Base):
     __tablename__ = "Order"
 
     id = Column(String, primary_key=True)
-    userId = Column(String, nullable=False)  # No FK — User table managed by Prisma
+    userId = Column(String, nullable=False)
     status = Column(String, default="PENDING")
     total = Column(Float, nullable=False)
 
@@ -91,7 +91,7 @@ class TryOnJob(Base):
     __tablename__ = "TryOnJob"
 
     id = Column(String, primary_key=True)
-    userId = Column(String, nullable=True)  # No FK — User table managed by Prisma
+    userId = Column(String, nullable=True)
     productId = Column(String, nullable=True)
 
     userImageId = Column(String, ForeignKey("Upload.id"), nullable=False)
@@ -119,6 +119,3 @@ class TryOnJob(Base):
     user_image = relationship("Upload", foreign_keys=[userImageId], back_populates="user_jobs")
     product_image = relationship("Upload", foreign_keys=[productImageId], back_populates="product_jobs")
 
-
-# Note: User, Account, Session, VerificationToken models are not needed
-# since auth stays in Next.js. We reference User.id as a string FK only.

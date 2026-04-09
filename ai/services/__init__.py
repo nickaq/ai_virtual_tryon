@@ -5,6 +5,8 @@ __all__ = [
     "segmentation",
     "pose_detector",
     "garment_prep",
+    "tps_warp",
+    "occlusion",
     "alignment",
     "quality_control",
     "diffusion",

@@ -117,7 +117,7 @@ def detect_garment_anchor_points(
     else:
         anchors['right_shoulder'] = (x + w, y + int(h * 0.15))
     
-    # Bottom hem - lowest center point
+    # Bottom hem — lowest center point
     bottom_points = contour[contour[:, 0, 1] > (y + h * 0.8)]
     if len(bottom_points) > 0:
         center_x = x + w // 2
@@ -125,6 +125,46 @@ def detect_garment_anchor_points(
         anchors['hem_bottom'] = tuple(bottom_points[bottom_center_idx, 0])
     else:
         anchors['hem_bottom'] = (x + w // 2, y + h)
+    
+    # Extended anchors for TPS warping (waist and hem corners)
+    
+    # Left waist — left side at ~50% height
+    waist_region_left = contour[
+        (contour[:, 0, 0] < (x + w * 0.4)) &
+        (contour[:, 0, 1] > (y + h * 0.4)) &
+        (contour[:, 0, 1] < (y + h * 0.65))
+    ]
+    if len(waist_region_left) > 0:
+        left_idx = np.argmin(waist_region_left[:, 0, 0])
+        anchors['left_waist'] = tuple(waist_region_left[left_idx, 0])
+    
+    # Right waist — right side at ~50% height
+    waist_region_right = contour[
+        (contour[:, 0, 0] > (x + w * 0.6)) &
+        (contour[:, 0, 1] > (y + h * 0.4)) &
+        (contour[:, 0, 1] < (y + h * 0.65))
+    ]
+    if len(waist_region_right) > 0:
+        right_idx = np.argmax(waist_region_right[:, 0, 0])
+        anchors['right_waist'] = tuple(waist_region_right[right_idx, 0])
+    
+    # Left hem — bottom-left corner
+    hem_region_left = contour[
+        (contour[:, 0, 0] < (x + w * 0.4)) &
+        (contour[:, 0, 1] > (y + h * 0.75))
+    ]
+    if len(hem_region_left) > 0:
+        left_idx = np.argmin(hem_region_left[:, 0, 0])
+        anchors['left_hem'] = tuple(hem_region_left[left_idx, 0])
+    
+    # Right hem — bottom-right corner
+    hem_region_right = contour[
+        (contour[:, 0, 0] > (x + w * 0.6)) &
+        (contour[:, 0, 1] > (y + h * 0.75))
+    ]
+    if len(hem_region_right) > 0:
+        right_idx = np.argmax(hem_region_right[:, 0, 0])
+        anchors['right_hem'] = tuple(hem_region_right[right_idx, 0])
     
     return anchors
 

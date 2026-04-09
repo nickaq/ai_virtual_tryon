@@ -5,6 +5,7 @@ from typing import Dict, Tuple
 
 from backend.models.job import ErrorCode
 from backend.utils.image_utils import calculate_angle, distance
+from . import tps_warp
 
 
 class AlignmentError(Exception):
@@ -201,7 +202,9 @@ def align_and_composite(
     garment_mask: np.ndarray,
     garment_anchors: Dict[str, Tuple[int, int]],
     torso_mask: np.ndarray,
-    arms_mask: np.ndarray
+    arms_mask: np.ndarray,
+    head_mask: np.ndarray = None,
+    warp_mode: str = "tps"
 ) -> Tuple[np.ndarray, np.ndarray, Dict[str, float]]:
     """
     Complete alignment and compositing pipeline.
@@ -214,6 +217,8 @@ def align_and_composite(
         garment_anchors: Garment anchor points
         torso_mask: Person torso mask
         arms_mask: Person arms mask
+        head_mask: Person head/neck mask (optional, for occlusion)
+        warp_mode: Warping method — 'tps' (Thin-Plate Spline) or 'affine'
         
     Returns:
         Tuple of (draft composite, transformed garment mask, transform params)
@@ -224,27 +229,57 @@ def align_and_composite(
     try:
         h, w = person_image.shape[:2]
         
-        # Calculate transformation
-        transform_params = calculate_transform_params(garment_anchors, person_keypoints)
+        if warp_mode == "tps":
+            # TPS warping — non-linear deformation using control points
+            try:
+                transformed_garment, transformed_mask, transform_params = tps_warp.apply_tps_warp(
+                    garment_image=garment_image,
+                    garment_mask=garment_mask,
+                    garment_anchors=garment_anchors,
+                    person_keypoints=person_keypoints,
+                    output_shape=(h, w)
+                )
+            except tps_warp.TPSWarpError as e:
+                # Fallback to affine if TPS fails (e.g., too few control points)
+                print(f"TPS warp failed ({e.message}), falling back to affine.")
+                transform_params = calculate_transform_params(garment_anchors, person_keypoints)
+                transformed_garment, transformed_mask = apply_affine_transform(
+                    garment_image, garment_mask, transform_params, (h, w)
+                )
+        else:
+            # Classic affine transform
+            transform_params = calculate_transform_params(garment_anchors, person_keypoints)
+            transformed_garment, transformed_mask = apply_affine_transform(
+                garment_image, garment_mask, transform_params, (h, w)
+            )
         
-        # Apply transformation
-        transformed_garment, transformed_mask = apply_affine_transform(
-            garment_image,
-            garment_mask,
-            transform_params,
-            (h, w)
-        )
-        
-        # Composite
-        draft_composite = composite_garment_on_person(
-            person_image,
-            transformed_garment,
-            transformed_mask,
-            torso_mask,
-            arms_mask
-        )
+        # Composite using layer-based occlusion if available
+        try:
+            from .occlusion import composite_layers, create_layer_stack
+            draft_composite = composite_layers(
+                create_layer_stack(
+                    person_image=person_image,
+                    garment_image=transformed_garment,
+                    garment_mask=transformed_mask,
+                    person_mask=torso_mask,  # used as body reference
+                    torso_mask=torso_mask,
+                    arms_mask=arms_mask,
+                    head_mask=head_mask
+                )
+            )
+        except (ImportError, Exception):
+            # Fallback to simple compositing
+            draft_composite = composite_garment_on_person(
+                person_image,
+                transformed_garment,
+                transformed_mask,
+                torso_mask,
+                arms_mask
+            )
         
         return draft_composite, transformed_mask, transform_params
         
+    except AlignmentError:
+        raise
     except Exception as e:
         raise AlignmentError(f"Alignment failed: {e}")

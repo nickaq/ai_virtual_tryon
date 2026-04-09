@@ -1,9 +1,11 @@
 """
-Try-On API router.
-Handles photo upload for virtual try-on, async AI processing, and job status retrieval.
+Try-On API router (Shop Layer).
+
+Handles photo upload for virtual try-on and job status retrieval.
+This is the shop-facing interface — it accepts user uploads and delegates
+to the AI Engine for processing via direct function call (no HTTP self-call).
 """
 import uuid
-import os
 import logging
 import asyncio
 from pathlib import Path
@@ -21,9 +23,6 @@ logger = logging.getLogger("ai-service")
 
 router = APIRouter(prefix="/api/try-on", tags=["try-on"])
 
-# URL used to self-call the AI processing endpoint
-AI_SERVICE_URL = os.environ.get("AI_SERVICE_URL", "http://localhost:8000")
-
 
 def _cuid() -> str:
     """Generate a short unique ID (similar to cuid)."""
@@ -34,65 +33,58 @@ async def _process_job_async(
     job_id: str,
     user_image_path: str,
     product_image_path: str,
-    db_url: str,
 ):
     """
     Process a try-on job asynchronously.
     Updates the TryOnJob status in the database and calls the AI processing
-    pipeline via an internal HTTP request.
+    pipeline directly via function import (no HTTP self-call).
     """
     from ..database import SessionLocal
-    import httpx
+    from ..models.job import Job, JobStatus
+    from ai.workers.processor import process_job
 
     db = SessionLocal()
     try:
         # Mark job as PROCESSING
-        job = db.query(TryOnJob).filter(TryOnJob.id == job_id).first()
-        if job:
-            job.status = "PROCESSING"
-            job.startedAt = datetime.now(timezone.utc)
+        job_record = db.query(TryOnJob).filter(TryOnJob.id == job_id).first()
+        if job_record:
+            job_record.status = "PROCESSING"
+            job_record.startedAt = datetime.now(timezone.utc)
             db.commit()
 
-        # Call internal AI processing endpoint
-        async with httpx.AsyncClient(timeout=120.0) as client:
-            response = await client.post(
-                f"{AI_SERVICE_URL}/ai/process",
-                json={
-                    "job_id": job_id,
-                    "user_image_path": user_image_path,
-                    "product_image_path": product_image_path,
-                    "cloth_category": "upper_body",
-                    "generation_mode": "quality",
-                    "realism_level": 3,
-                    "preserve_face": True,
-                    "preserve_background": True,
-                },
-            )
+        # Create Job model and process directly
+        job = Job(
+            job_id=job_id,
+            user_image_path=user_image_path,
+            product_image_path=product_image_path,
+            cloth_category="upper_body",
+            generation_mode="quality",
+            realism_level=3,
+            preserve_face=True,
+            preserve_background=True,
+        )
 
-            if response.status_code != 200:
-                raise Exception(f"AI Service returned {response.status_code}")
-
-            result = response.json()
+        await process_job(job)
 
         # Persist result into the database
-        job = db.query(TryOnJob).filter(TryOnJob.id == job_id).first()
-        if job:
-            job.status = "DONE" if result.get("status") == "DONE" else "FAILED"
-            job.resultPath = result.get("result_path")
-            job.qualityScore = result.get("quality_score")
-            job.errorCode = result.get("error_code")
-            job.errorMessage = result.get("error_message")
-            job.completedAt = datetime.now(timezone.utc)
+        job_record = db.query(TryOnJob).filter(TryOnJob.id == job_id).first()
+        if job_record:
+            job_record.status = "DONE" if job.status == JobStatus.DONE else "FAILED"
+            job_record.resultPath = f"storage/results/{job.job_id}.png" if job.status == JobStatus.DONE else None
+            job_record.qualityScore = job.quality_score
+            job_record.errorCode = job.error_code
+            job_record.errorMessage = job.error_message
+            job_record.completedAt = datetime.now(timezone.utc)
             db.commit()
 
     except Exception as e:
         logger.error(f"AI processing error for job {job_id}: {e}")
-        job = db.query(TryOnJob).filter(TryOnJob.id == job_id).first()
-        if job:
-            job.status = "FAILED"
-            job.errorCode = "AI_SERVICE_ERROR"
-            job.errorMessage = str(e)
-            job.completedAt = datetime.now(timezone.utc)
+        job_record = db.query(TryOnJob).filter(TryOnJob.id == job_id).first()
+        if job_record:
+            job_record.status = "FAILED"
+            job_record.errorCode = "AI_SERVICE_ERROR"
+            job_record.errorMessage = str(e)
+            job_record.completedAt = datetime.now(timezone.utc)
             db.commit()
     finally:
         db.close()
@@ -154,14 +146,14 @@ async def upload_tryon(
     db.commit()
     db.refresh(job)
 
-    # Resolve absolute image paths for the AI service
-    project_root = Path(__file__).resolve().parent.parent.parent.parent
-    abs_user_path = str(project_root / "public" / user_photo_path.lstrip("/"))
-    abs_product_path = str(project_root / "public" / f"products/{productId}.jpg")
+    # Resolve absolute image paths for the AI engine
+    project_root = Path(__file__).resolve().parent.parent.parent
+    abs_user_path = str(project_root / "storage" / "uploads" / user_photo_path.lstrip("/"))
+    abs_product_path = str(project_root / "storage" / "products" / f"{productId}.jpg")
 
-    # Fire-and-forget async processing
+    # Fire-and-forget async processing (direct call, no HTTP self-call)
     asyncio.create_task(
-        _process_job_async(job.id, abs_user_path, abs_product_path, "")
+        _process_job_async(job.id, abs_user_path, abs_product_path)
     )
 
     return TryOnUploadResponse(

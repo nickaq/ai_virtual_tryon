@@ -73,7 +73,7 @@ def create_order(order_data: OrderCreate, db: Session = Depends(get_db)):
     # Persist order with items
     order = Order(
         id=_cuid(),
-        userId="guest",  # Auth is handled separately in the Next.js layer
+        userId="guest",  # Guest checkout; auth layer optional
         status="PENDING",
         total=total,
         contactName=order_data.contactName,

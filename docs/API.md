@@ -2,26 +2,33 @@
 
 ## Base URL
 ```
-http://localhost:3000/api
+http://localhost:8000
 ```
 
-## Endpoints
+## Job Status Flow
+```
+QUEUED → PROCESSING → DONE | FAILED
+```
+
+---
+
+## Shop Layer
 
 ### Products
 
 #### GET /api/products
-Отримати список товарів з фільтрацією та пагінацією.
+List products with filtering and pagination.
 
 **Query Parameters:**
-- `page` (number, optional) - Номер сторінки (за замовчуванням: 1)
-- `limit` (number, optional) - Кількість товарів на сторінку (за замовчуванням: 20)
-- `category` (string, optional) - Фільтр по категорії: `jackets`, `pants`, `shirts`, `shoes`, `accessories`
-- `search` (string, optional) - Пошук по назві і опису
-- `minPrice` (number, optional) - Мінімальна ціна
-- `maxPrice` (number, optional) - Максимальна ціна
-- `season` (string, optional) - Сезон: `spring`, `summer`, `fall`, `winter`, `all-season`
+- `page` (int, optional) — Page number (default: 1)
+- `limit` (int, optional) — Items per page (default: 20, max: 100)
+- `category` (string, optional) — Filter by category: `jackets`, `pants`, `shirts`, `shoes`, `accessories`
+- `search` (string, optional) — Full-text search in name and description
+- `minPrice` (float, optional) — Minimum price filter
+- `maxPrice` (float, optional) — Maximum price filter
+- `season` (string, optional) — Season filter: `spring`, `summer`, `fall`, `winter`, `all-season`
 
-**Response:**
+**Response (200):**
 ```json
 {
   "products": [
@@ -32,9 +39,9 @@ http://localhost:3000/api
       "price": 299.99,
       "category": "jackets",
       "sizes": ["S", "M", "L", "XL"],
-      "colors": ["Чорний", "Темно-сірий"],
+      "colors": ["Black", "Dark Gray"],
       "season": "winter",
-      "composition": "90% вовна, 10% кашемір",
+      "composition": "90% wool, 10% cashmere",
       "inStock": true,
       "imageUrl": null
     }
@@ -48,20 +55,14 @@ http://localhost:3000/api
 }
 ```
 
-#### GET /api/products/:id
-Отримати деталі конкретного товару.
+#### GET /api/products/{product_id}
+Get a single product by ID.
 
-**Response:**
+**Response (200):** Single product object (same schema as above).
+
+**Response (404):**
 ```json
-{
-  "id": "...",
-  "name": "...",
-  "description": "...",
-  "price": 299.99,
-  "sizes": ["S", "M", "L"],
-  "colors": ["..."],
-  ...
-}
+{ "detail": "Product not found" }
 ```
 
 ---
@@ -69,7 +70,7 @@ http://localhost:3000/api
 ### Orders
 
 #### POST /api/orders
-Створити нове замовлення.
+Create a new order.
 
 **Request Body:**
 ```json
@@ -79,20 +80,20 @@ http://localhost:3000/api
       "productId": "cm65yw7fh0000144hfpnqbuvp",
       "quantity": 2,
       "selectedSize": "M",
-      "selectedColor": "Чорний"
+      "selectedColor": "Black"
     }
   ],
-  "contactName": "Іван Петренко",
-  "email": "ivan@example.com",
-  "phone": "+380123456789",
-  "address": "вул. Хрещатик 1",
-  "city": "Київ",
+  "contactName": "John Doe",
+  "email": "john@example.com",
+  "phone": "+1234567890",
+  "address": "123 Main St",
+  "city": "Kyiv",
   "postalCode": "01001",
-  "country": "Україна"
+  "country": "Ukraine"
 }
 ```
 
-**Response:**
+**Response (201):**
 ```json
 {
   "orderId": "...",
@@ -102,9 +103,9 @@ http://localhost:3000/api
 ```
 
 #### GET /api/orders
-Отримати список замовлень користувача.
+List the 20 most recent orders with items and product details.
 
-**Response:**
+**Response (200):**
 ```json
 {
   "orders": [
@@ -112,7 +113,7 @@ http://localhost:3000/api
       "id": "...",
       "status": "PENDING",
       "total": 599.98,
-      "createdAt": "2024-...",
+      "createdAt": "2026-...",
       "items": [...]
     }
   ]
@@ -121,46 +122,43 @@ http://localhost:3000/api
 
 ---
 
-### AI Try-On
+### Try-On (Shop-Facing)
 
 #### POST /api/try-on/upload
-Завантажити фото для примірювання.
+Upload a user photo to initiate a virtual try-on job.
 
-**Rate Limit:** 5 запитів на годину на IP
+**Rate Limit:** 5 requests per hour per IP.
 
 **Form Data:**
-- `productId` (string) - ID товару
-- `photo` (File) - Фото користувача (макс 10MB, image/*)
+- `productId` (string, required) — Product ID to try on
+- `photo` (File, required) — User photo (max 10MB, image/*)
 
-**Response:**
+**Response (201):**
 ```json
 {
   "jobId": "...",
-  "status": "PENDING",
-  "message": "Фото завантажено. Обробка почалася."
+  "status": "QUEUED",
+  "message": "Photo uploaded. Processing started."
 }
 ```
 
-**Error (429):**
+**Response (429):**
 ```json
-{
-  "error": "Перевищено ліміт запитів. Спробуйте пізніше.",
-  "resetAt": 1707408000000
-}
+{ "detail": "Rate limit exceeded. Please try again later." }
 ```
 
-#### GET /api/try-on/:jobId
-Отримати статус примірювання.
+#### GET /api/try-on/{job_id}
+Get current status of a try-on job.
 
-**Response:**
+**Response (200):**
 ```json
 {
   "id": "...",
-  "status": "COMPLETED", // PENDING | PROCESSING | COMPLETED | FAILED
+  "status": "DONE",
   "productId": "...",
   "userPhotoUrl": "/uploads/try-on/user-photos/...",
-  "resultPhotoUrl": "/uploads/try-on/results/...", // null якщо не готово
-  "errorMessage": null, // текст помилки якщо FAILED
+  "resultPhotoUrl": "storage/results/...",
+  "errorMessage": null,
   "createdAt": "...",
   "updatedAt": "..."
 }
@@ -168,43 +166,159 @@ http://localhost:3000/api
 
 ---
 
-## Error Responses
+## AI Engine Layer
 
-Всі endpoints повертають помилки у форматі:
+### POST /ai/process
+Internal endpoint for path-based AI processing. Called by the shop layer.
 
+**Request Body:**
 ```json
 {
-  "error": "Опис помилки"
+  "job_id": "uuid-string",
+  "user_image_path": "/absolute/path/to/user.jpg",
+  "product_image_path": "/absolute/path/to/product.jpg",
+  "cloth_category": "upper_body",
+  "generation_mode": "quality",
+  "warp_mode": "tps",
+  "refinement_mode": "img2img",
+  "realism_level": 3,
+  "preserve_face": true,
+  "preserve_background": true,
+  "max_retries": 2
 }
 ```
 
+**Response (200):**
+```json
+{
+  "job_id": "...",
+  "status": "DONE",
+  "result_path": "storage/results/{job_id}.png",
+  "quality_score": 0.85,
+  "error_code": null,
+  "error_message": null
+}
+```
+
+### POST /ai/tryon/submit
+Submit a virtual try-on job via file upload or URL (legacy endpoint).
+
+**Form Data:**
+- `user_image` (File, optional) or `user_image_url` (string, optional) — User photo
+- `product_image` (File, optional) or `product_image_url` (string, optional) — Garment image
+- `product_id` (string, optional) — Product ID
+- `cloth_category` (string, optional) — Garment type
+- `generation_mode` (string, default: `"quality"`) — `"fast"` or `"quality"`
+- `warp_mode` (string, default: `"tps"`) — `"affine"` or `"tps"`
+- `refinement_mode` (string, default: `"img2img"`) — `"img2img"` or `"inpainting"`
+- `preserve_face` (bool, default: true)
+- `preserve_background` (bool, default: true)
+- `realism_level` (int, default: 3) — 1–5 scale
+- `max_retries` (int, default: 2) — 0–3
+
+**Response (200):**
+```json
+{
+  "job_id": "...",
+  "status": "QUEUED",
+  "message": "Job submitted successfully"
+}
+```
+
+### GET /ai/tryon/status/{job_id}
+Get detailed status of a try-on job with quality metrics.
+
+**Response (200):**
+```json
+{
+  "job_id": "...",
+  "status": "DONE",
+  "result_image_url": "/results/{job_id}.png",
+  "quality_score": 0.85,
+  "debug_artifacts": {
+    "person_mask": "/artifacts/{job_id}/person_mask.png",
+    "quality_report": "/artifacts/{job_id}/quality_report.json"
+  },
+  "error_code": null,
+  "error_message": null,
+  "retry_count": 0,
+  "created_at": "...",
+  "updated_at": "...",
+  "started_at": "...",
+  "completed_at": "..."
+}
+```
+
+### GET /ai/tryon/result/{job_id}
+Download the result image for a completed job.
+
+**Response (200):** PNG image file.
+
+**Response (400):**
+```json
+{ "detail": "Job is not completed. Current status: PROCESSING" }
+```
+
+---
+
+## System Endpoints
+
+### GET /
+Service info.
+```json
+{ "service": "AI Virtual Try-On", "version": "2.0.0", "status": "running" }
+```
+
+### GET /health
+Health check with queue statistics.
+```json
+{ "status": "healthy", "queue_stats": { "pending": 0, "processing": 0, "completed": 5 } }
+```
+
+---
+
+## Error Responses
+
+All endpoints return errors in the format:
+```json
+{ "detail": "Error description" }
+```
+
 **HTTP Status Codes:**
-- `400` - Bad Request (некоректні дані)
-- `401` - Unauthorized (потрібна авторизація)
-- `404` - Not Found (ресурс не знайдено)
-- `429` - Too Many Requests (rate limit)
-- `500` - Internal Server Error
+- `400` — Bad Request (invalid input data)
+- `404` — Not Found (resource does not exist)
+- `429` — Too Many Requests (rate limit exceeded)
+- `500` — Internal Server Error
+
+**AI Error Codes (in job status):**
+- `INVALID_IMAGE_FORMAT` — Unsupported image type
+- `IMAGE_TOO_LARGE` — Image exceeds size limit
+- `SEGMENTATION_FAILED` — Person segmentation failed
+- `POSE_FAILED` — Pose detection failed
+- `WARP_FAILED` — Garment alignment/warping failed
+- `DIFFUSION_ERROR` — Diffusion refinement failed
+- `QUALITY_CHECK_FAILED` — Quality check failed
+- `STORAGE_ERROR` — File storage error
+- `TIMEOUT` — Operation timed out
+- `UNKNOWN_ERROR` — Unexpected error
 
 ---
 
 ## Security
 
-### API Keys
-Всі чутливі ключі зберігаються в `.env.local` і **не включені в git**.
-
 ### Rate Limiting
-- Try-on upload: 5 запитів/годину на IP
-- Інші endpoints: без обмежень (можна додати при потребі)
+- Try-on upload: 5 requests/hour per IP
+- Other endpoints: no limits (configurable)
 
 ### File Upload
-- Максимальний розмір: 10MB
-- Дозволені типи: image/*
-- Автоматичне видалення фото через 7 днів
+- Maximum size: 10MB
+- Allowed types: image/*
+- Auto-cleanup after 7 days
 
 ### Data Privacy
-- Персональні дані не логуються
-- Фото користувачів захищені і доступні лише власникам
-- Автоматичне видалення після використання
+- Personal data is not logged
+- User photos are protected and accessible only by job ID
+- Automatic deletion after processing
 
 ---
 
@@ -213,27 +327,30 @@ http://localhost:3000/api
 ### Testing API
 
 ```bash
-# Get products
-curl http://localhost:3000/api/products
+# List products
+curl http://localhost:8000/api/products
 
 # Get product by ID
-curl http://localhost:3000/api/products/cm65yw7fh0000144hfpnqbuvp
+curl http://localhost:8000/api/products/cm65yw7fh0000144hfpnqbuvp
 
 # Create order
-curl -X POST http://localhost:3000/api/orders \
+curl -X POST http://localhost:8000/api/orders \
   -H "Content-Type: application/json" \
-  -d '{"items":[...],"contactName":"...",...}'
+  -d '{"items":[...],"contactName":"...","email":"...",...}'
 
 # Upload try-on photo
-curl -X POST http://localhost:3000/api/try-on/upload \
+curl -X POST http://localhost:8000/api/try-on/upload \
   -F "productId=..." \
   -F "photo=@/path/to/photo.jpg"
+
+# Check job status
+curl http://localhost:8000/api/try-on/{jobId}
 ```
 
 ### Logs
 
-Логи зберігаються в директорії `logs/`:
-- `error.log` - тільки помилки
-- `combined.log` - всі логи
+Logs are stored in the `logs/` directory:
+- `error.log` — errors only
+- `combined.log` — all logs
 
-Персональні дані автоматично фільтруються.
+Personal data is automatically filtered from logs.

@@ -75,7 +75,8 @@ def save_debug_artifacts(
     torso_mask: Optional[np.ndarray] = None,
     garment_mask: Optional[np.ndarray] = None,
     draft_composite: Optional[np.ndarray] = None,
-    keypoints: Optional[Dict] = None
+    keypoints: Optional[Dict] = None,
+    quality_report: Optional[Dict] = None
 ) -> Dict[str, str]:
     """
     Save debug artifacts for analysis.
@@ -131,6 +132,12 @@ def save_debug_artifacts(
             serializable_kp = {k: list(v) for k, v in keypoints.items()}
             path.write_text(json.dumps(serializable_kp, indent=2))
             artifacts['keypoints'] = f"/artifacts/{job_id}/keypoints.json"
+        
+        # Save quality report as JSON
+        if quality_report is not None:
+            path = artifact_dir / "quality_report.json"
+            path.write_text(json.dumps(quality_report, indent=2))
+            artifacts['quality_report'] = f"/artifacts/{job_id}/quality_report.json"
         
         return artifacts
         

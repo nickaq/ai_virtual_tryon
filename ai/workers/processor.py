@@ -60,7 +60,8 @@ async def process_job(job: Job) -> bool:
         )
         
         # STEP 5 & 6 — GEOMETRIC ALIGNMENT & OCCLUSION HANDLING
-        print(f"  STEP 5 & 6: Geometric Alignment & Occlusion Handling...")
+        print(f"  STEP 5 & 6: Geometric Alignment ({job.warp_mode.upper()}) & Occlusion Handling...")
+        head_mask = masks.get('head_neck')
         draft_composite, transformed_garment_mask, transform_params = alignment.align_and_composite(
             person_image=person_image,
             person_keypoints=person_keypoints,
@@ -68,7 +69,9 @@ async def process_job(job: Job) -> bool:
             garment_mask=garment_mask,
             garment_anchors=garment_anchors,
             torso_mask=torso_mask,
-            arms_mask=arms_mask
+            arms_mask=arms_mask,
+            head_mask=head_mask,
+            warp_mode=job.warp_mode
         )
         
         geometric_score, _ = quality_control.quality_control(
@@ -79,9 +82,21 @@ async def process_job(job: Job) -> bool:
             transform_params=transform_params
         )
         
+        # Build structured quality report for debug artifacts
+        geo_quality_report = quality_control.build_quality_report(
+            garment_anchors=garment_anchors,
+            person_keypoints=person_keypoints,
+            garment_mask=transformed_garment_mask,
+            person_mask=person_mask,
+            transform_params=transform_params
+        )
+        print(f"  Geometric quality: {geo_quality_report.overall_score:.3f} "
+              f"(passed={geo_quality_report.passed}, retry_rec={geo_quality_report.retry_recommended})")
+        
         # STEP 7 — COMPOSITING
         print(f"  STEP 7: Compositing coarse tryon image...")
         coarse_tryon_image = draft_composite
+        assert coarse_tryon_image is not None, "Diffusion requires geometric alignment output"
         final_result = coarse_tryon_image
         final_score = geometric_score
         
@@ -89,7 +104,9 @@ async def process_job(job: Job) -> bool:
             print(f"  Generation mode is 'fast'. Skipping diffusion...")
         else:
             # STEP 8 & 9 — DIFFUSION REFINEMENT & QUALITY EVALUATION
-            print(f"  STEP 8: Diffusion Refinement & STEP 9: Quality Evaluation...")
+            from ai.services.diffusion import RefinementMode
+            refinement_mode = RefinementMode(job.refinement_mode)
+            print(f"  STEP 8: Diffusion Refinement ({refinement_mode.value}) & STEP 9: Quality Evaluation...")
             attempts = 0
             quality_passed = False
             
@@ -107,7 +124,9 @@ async def process_job(job: Job) -> bool:
                         preserve_face=job.preserve_face,
                         preserve_background=job.preserve_background,
                         realism_level=current_realism,
-                        garment_type=job.cloth_category
+                        garment_type=job.cloth_category,
+                        mode=refinement_mode,
+                        garment_mask=transformed_garment_mask
                     )
                     
                     # Evaluate result
@@ -142,7 +161,8 @@ async def process_job(job: Job) -> bool:
             torso_mask=torso_mask,
             garment_mask=transformed_garment_mask,
             draft_composite=coarse_tryon_image,
-            keypoints=person_keypoints
+            keypoints=person_keypoints,
+            quality_report=geo_quality_report.to_dict()
         )
         job.debug_artifacts = debug_artifacts
         

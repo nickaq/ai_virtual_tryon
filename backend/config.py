@@ -12,6 +12,10 @@ class Settings(BaseSettings):
         default="runwayml/stable-diffusion-v1-5",
         env="DIFFUSION_MODEL_ID"
     )
+    diffusion_inpaint_model_id: str = Field(
+        default="runwayml/stable-diffusion-inpainting",
+        env="DIFFUSION_INPAINT_MODEL_ID"
+    )
     diffusion_device: str = Field(
         default="cpu",
         env="DIFFUSION_DEVICE"
@@ -38,7 +42,7 @@ class Settings(BaseSettings):
     debug: bool = Field(default=False, env="DEBUG")
     save_debug_artifacts: bool = Field(default=False, env="SAVE_DEBUG_ARTIFACTS")
     
-    model_config = SettingsConfigDict(env_file=".env", case_sensitive=False)
+    model_config = SettingsConfigDict(env_file=".env", case_sensitive=False, extra="ignore")
     
     @property
     def uploads_path(self) -> Path:

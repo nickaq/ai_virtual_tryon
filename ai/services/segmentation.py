@@ -177,7 +177,7 @@ def segment_person(
         keypoints: Detected keypoints
         
     Returns:
-        Dictionary with 'person', 'torso', 'arms' masks
+        Dictionary with 'person', 'torso', 'arms', 'head_neck' masks
         
     Raises:
         SegmentationError: If segmentation fails
@@ -189,8 +189,17 @@ def segment_person(
     torso_mask = extract_torso_mask(person_mask, keypoints)
     arms_mask = extract_arms_mask(person_mask, torso_mask, keypoints)
     
+    # Extract head/neck mask for occlusion handling
+    try:
+        from .occlusion import extract_head_neck_mask
+        head_neck_mask = extract_head_neck_mask(person_mask, keypoints)
+    except (ImportError, Exception):
+        # Fallback: empty mask if occlusion module not available
+        head_neck_mask = np.zeros_like(person_mask)
+    
     return {
         'person': person_mask,
         'torso': torso_mask,
-        'arms': arms_mask
+        'arms': arms_mask,
+        'head_neck': head_neck_mask,
     }
