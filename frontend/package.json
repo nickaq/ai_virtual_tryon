@@ -1,0 +1,40 @@
+{
+  "name": "ai_try_on",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --webpack",
+    "build": "next build --webpack",
+    "start": "next start",
+    "lint": "eslint",
+    "db:studio": "prisma studio --schema=src/backend/prisma/schema.prisma",
+    "db:generate": "prisma generate --schema=src/backend/prisma/schema.prisma",
+    "db:migrate": "prisma migrate dev --schema=src/backend/prisma/schema.prisma"
+  },
+  "prisma": {
+    "seed": "ts-node --compiler-options {\"module\":\"CommonJS\"} src/backend/prisma/seed.ts"
+  },
+  "dependencies": {
+    "@auth/prisma-adapter": "^2.11.1",
+    "@prisma/client": "5.22.0",
+    "bcrypt": "^6.0.0",
+    "nanoid": "^5.1.6",
+    "next": "16.1.6",
+    "next-auth": "^5.0.0-beta.30",
+    "prisma": "5.22.0",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "winston": "^3.19.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "ts-node": "^10.9.2",
+    "typescript": "^5"
+  }
+}
