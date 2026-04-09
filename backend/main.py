@@ -89,6 +89,11 @@ uploads_dir = Path("./storage/uploads")
 uploads_dir.mkdir(parents=True, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=str(uploads_dir)), name="uploads")
 
+# Mount products
+products_dir = Path("./storage/products")
+products_dir.mkdir(parents=True, exist_ok=True)
+app.mount("/products", StaticFiles(directory=str(products_dir)), name="products")
+
 
 @app.get("/")
 async def root():

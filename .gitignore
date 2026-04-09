@@ -54,3 +54,10 @@ node_modules/
 .next/
 node_modules/
 .next/
+.venv/
+.venv_tests/
+venv/
+node_modules/
+__pycache__/
+*.pyc
+.next/
