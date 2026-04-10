@@ -1,8 +1,8 @@
-"""FastAPI application for AI Virtual Try-On service.
+"""Застосунок FastAPI для сервісу AI-віртуальної примірочної.
 
-Architecture:
-  Shop Layer   — products, orders, uploads, try-on initiation (/api/*)
-  AI Engine    — AI processing, job management, results (/ai/*)
+Архітектура:
+  Шар магазину — товари, замовлення, завантаження, ініціація примірки (/api/*)
+  Шар AI рушія   — обробка ШІ, управління завданнями, результати (/ai/*)
 """
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -22,7 +22,7 @@ from .utils.error_handler import (
 from .routers import products, orders, tryon, uploads, ai_engine
 from ai.workers import job_queue, start_worker
 
-# Configure logging
+# Налаштування логування
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
@@ -32,25 +32,25 @@ logger = logging.getLogger("ai-service")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Lifespan context manager for startup/shutdown events."""
-    # Startup
+    """Контекстний менеджер життєвого циклу для подій запуску/зупинки."""
+    # Запуск
     logger.info("Starting AI Virtual Try-On Service...")
 
-    # Ensure storage directories exist
+    # Перевірка існування директорій сховища
     settings.ensure_directories()
 
-    # Start background worker
+    # Запуск фонового процесу
     start_worker()
 
     logger.info(f"Service started on {settings.host}:{settings.port}")
 
     yield
 
-    # Shutdown
+    # Зупинка
     logger.info("Shutting down service...")
 
 
-# Create FastAPI app
+# Створення застосунку FastAPI
 app = FastAPI(
     title="AI Virtual Try-On Service",
     description="AI-powered virtual clothing try-on — Shop Layer + AI Engine",
@@ -58,7 +58,7 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
-# Add CORS middleware
+# Додавання CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Configure appropriately for production
@@ -67,29 +67,29 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Register exception handlers
+# Реєстрація обробників винятків
 app.add_exception_handler(ApiError, api_error_handler)
 app.add_exception_handler(ValidationError, validation_error_handler)
 
-# ── Shop Layer routers ──────────────────────────────────────────────
+# ── Маршрути шару магазину ──────────────────────────────────────────────
 app.include_router(products.router)
 app.include_router(orders.router)
 app.include_router(tryon.router)
 app.include_router(uploads.router)
 
-# ── AI Engine router ────────────────────────────────────────────────
+# ── Маршрути шару AI рушія ────────────────────────────────────────────────
 app.include_router(ai_engine.router)
 
-# Mount static file serving for results and artifacts
+# Монтування обслуговування статичних файлів для результатів та артефактів
 app.mount("/results", StaticFiles(directory=str(settings.results_path)), name="results")
 app.mount("/artifacts", StaticFiles(directory=str(settings.artifacts_path)), name="artifacts")
 
-# Mount uploads for serving uploaded files
+# Монтування завантажень для обслуговування завантажених файлів
 uploads_dir = Path("./storage/uploads")
 uploads_dir.mkdir(parents=True, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=str(uploads_dir)), name="uploads")
 
-# Mount products
+# Монтування товарів
 products_dir = Path("./storage/products")
 products_dir.mkdir(parents=True, exist_ok=True)
 app.mount("/products", StaticFiles(directory=str(products_dir)), name="products")
@@ -97,7 +97,7 @@ app.mount("/products", StaticFiles(directory=str(products_dir)), name="products"
 
 @app.get("/")
 async def root():
-    """Root endpoint."""
+    """Кореневий ендпоінт."""
     return {
         "service": "AI Virtual Try-On",
         "version": "2.0.0",
@@ -107,7 +107,7 @@ async def root():
 
 @app.get("/health")
 async def health():
-    """Health check endpoint."""
+    """Ендпоінт перевірки стану (Health check)."""
     stats = job_queue.get_stats()
     return {"status": "healthy", "queue_stats": stats}
 

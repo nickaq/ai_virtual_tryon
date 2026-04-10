@@ -1,21 +1,21 @@
-# AI Virtual Try-On
+# AI-віртуальна примірочна (AI Virtual Try-On)
 
-AI-powered virtual clothing try-on service. Users upload a photo and select a garment from the catalog — the system generates a realistic composite showing the person wearing the selected clothing.
+AI-сервіс віртуальної примірки одягу. Користувачі завантажують фото та обирають одяг з каталогу — система генерує реалістичне зображення, що показує людину в обраному одязі.
 
-## Architecture
+## Архітектура
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                      Frontend (Next.js)                  │
+│                      Фронтенд (Next.js)                  │
 │                   http://localhost:3000                   │
 └───────────────────────┬─────────────────────────────────┘
                         │  REST API
 ┌───────────────────────▼─────────────────────────────────┐
-│                   FastAPI Backend                        │
+│                   Бекенд (FastAPI)                       │
 │                  http://localhost:8000                    │
 │                                                          │
 │  ┌──────────────────┐    ┌───────────────────────────┐  │
-│  │   Shop Layer      │    │     AI Engine Layer        │  │
+│  │   Шар магазину    │    │     Шар AI рушія           │  │
 │  │                   │    │                            │  │
 │  │  /api/products    │    │  /ai/process               │  │
 │  │  /api/orders      │    │  /ai/tryon/submit          │  │
@@ -24,124 +24,124 @@ AI-powered virtual clothing try-on service. Users upload a photo and select a ga
 │  └──────────────────┘    └──────────┬────────────────┘  │
 │                                      │                   │
 │  ┌───────────────────────────────────▼────────────────┐  │
-│  │              11-Step AI Pipeline                    │  │
+│  │              11-етапний AI Конвеєр                  │  │
 │  │                                                     │  │
-│  │  1. Validation & Loading (image_loader)             │  │
-│  │  2. Human Analysis — Pose Detection (pose_detector) │  │
-│  │  3. Segmentation (segmentation)                     │  │
-│  │  4. Clothing Processing (garment_prep)              │  │
-│  │  5. Geometric Alignment — TPS Warping (tps_warp)    │  │
-│  │  6. Occlusion Handling (occlusion)                  │  │
-│  │  7. Compositing (alignment)                         │  │
-│  │  8. Diffusion Refinement (diffusion)                │  │
-│  │  9. Quality Evaluation (quality_control)            │  │
-│  │ 10. Storage (storage)                               │  │
-│  │ 11. Response                                        │  │
+│  │  1. Валідація та завантаження (image_loader)        │  │
+│  │  2. Аналіз людини — визначення пози (pose_detector) │  │
+│  │  3. Сегментація (segmentation)                      │  │
+│  │  4. Обробка одягу (garment_prep)                    │  │
+│  │  5. Геометричне вирівнювання — TPS (tps_warp)       │  │
+│  │  6. Обробка перекриттів (occlusion)                 │  │
+│  │  7. Композитинг (alignment)                         │  │
+│  │  8. Дифузійне покращення (diffusion)                │  │
+│  │  9. Оцінка якості (quality_control)                 │  │
+│  │ 10. Збереження (storage)                            │  │
+│  │ 11. Відповідь                                       │  │
 │  └─────────────────────────────────────────────────────┘  │
 └──────────────────────────────────────────────────────────┘
 ```
 
-## Project Structure
+## Структура проекту
 
 ```
 ai_try_on/
-├── ai/                       # AI processing engine
-│   ├── services/             # Pipeline stage modules
-│   │   ├── image_loader.py   # Stage 1: image loading & normalization
-│   │   ├── pose_detector.py  # Stage 2: MediaPipe pose detection
-│   │   ├── segmentation.py   # Stage 3: person/torso/arms/head segmentation
-│   │   ├── garment_prep.py   # Stage 4: garment background removal & anchors
-│   │   ├── tps_warp.py       # Stage 5: Thin-Plate Spline warping (own impl.)
-│   │   ├── occlusion.py      # Stage 6: Z-order layered occlusion handling
-│   │   ├── alignment.py      # Stage 7: alignment orchestration & compositing
-│   │   ├── diffusion.py      # Stage 8: Stable Diffusion refinement (img2img/inpaint)
-│   │   ├── quality_control.py# Stage 9: quality gate with structured reports
-│   │   └── storage.py        # Stage 10: result & debug artifact storage
+├── ai/                       # Ядро обробки ШІ
+│   ├── services/             # Модулі етапів конвеєра
+│   │   ├── image_loader.py   # Етап 1: завантаження та нормалізація зображень
+│   │   ├── pose_detector.py  # Етап 2: визначення пози за допомогою MediaPipe
+│   │   ├── segmentation.py   # Етап 3: сегментація людини/тулуба/рук/голови
+│   │   ├── garment_prep.py   # Етап 4: видалення фону одягу та точки прив'язки
+│   │   ├── tps_warp.py       # Етап 5: деформація Thin-Plate Spline (власна реалізація)
+│   │   ├── occlusion.py      # Етап 6: пошарова обробка перекриттів (Z-order)
+│   │   ├── alignment.py      # Етап 7: оркестрація вирівнювання та композитинг
+│   │   ├── diffusion.py      # Етап 8: покращення через Stable Diffusion (img2img/inpaint)
+│   │   ├── quality_control.py# Етап 9: перевірка якості зі структурованими звітами
+│   │   └── storage.py        # Етап 10: збереження результатів та артефактів для налагодження
 │   └── workers/
-│       ├── processor.py      # Background job processor (11-step pipeline)
-│       └── job_queue.py      # In-memory job queue
-├── backend/                  # FastAPI application
-│   ├── main.py               # App entrypoint, CORS, lifespan
-│   ├── config.py             # Pydantic settings (env-based)
-│   ├── database.py           # SQLAlchemy engine & session
-│   ├── models/               # Data models
-│   │   ├── job.py            # Job status & error codes
-│   │   ├── db_models.py      # ORM models (Product, Order, TryOnJob, etc.)
-│   │   ├── schemas.py        # Pydantic API schemas
-│   │   ├── requests.py       # Try-on request/response models
-│   │   └── ai_requests.py    # Internal AI processing request/response
-│   ├── routers/              # API route modules
+│       ├── processor.py      # Обробник фонових завдань (11-етапний конвеєр)
+│       └── job_queue.py      # Черга завдань у пам'яті
+├── backend/                  # Застосунок FastAPI
+│   ├── main.py               # Точка входу застосунку, CORS, lifespan
+│   ├── config.py             # Налаштування Pydantic (на основі змінних оточення)
+│   ├── database.py           # Двигун та сесії SQLAlchemy
+│   ├── models/               # Моделі даних
+│   │   ├── job.py            # Статуси завдань та коди помилок
+│   │   ├── db_models.py      # ORM моделі (Product, Order, TryOnJob, тощо)
+│   │   ├── schemas.py        # Pydantic схеми API
+│   │   ├── requests.py       # Моделі запитів/відповідей для примірки
+│   │   └── ai_requests.py    # Запити/відповіді внутрішньої обробки ШІ
+│   ├── routers/              # Модулі маршрутів API
 │   │   ├── products.py       # GET /api/products
 │   │   ├── orders.py         # POST/GET /api/orders
 │   │   ├── tryon.py          # POST /api/try-on/upload, GET /api/try-on/{id}
-│   │   ├── uploads.py        # File upload utilities
-│   │   └── ai_engine.py      # AI processing endpoints
-│   └── utils/                # Shared utilities
-│       ├── image_utils.py    # OpenCV/PIL helpers
-│       ├── validation.py     # File format & size validation
-│       ├── file_storage.py   # Disk file operations
-│       ├── error_handler.py  # Global exception handlers
-│       └── rate_limit.py     # IP-based rate limiting
-├── frontend/                 # Next.js frontend application
-├── experiments/              # Test scripts & seed data
-├── docs/                     # API documentation
-├── storage/                  # Runtime file storage (uploads, results, artifacts)
-├── models/                   # ML model weights (gitignored)
-└── docker/                   # Docker configuration
+│   │   ├── uploads.py        # Утиліти завантаження файлів
+│   │   └── ai_engine.py      # Ендпоінти обробки ШІ
+│   └── utils/                # Спільні утиліти
+│       ├── image_utils.py    # Допоміжні функції OpenCV/PIL
+│       ├── validation.py     # Валідація форматів та розмірів файлів
+│       ├── file_storage.py   # Операції з файлами на диску
+│       ├── error_handler.py  # Глобальні обробники винятків
+│       └── rate_limit.py     # Обмеження швидкості (Rate limiting) за IP
+├── frontend/                 # Фронтенд-застосунок Next.js
+├── experiments/              # Тестові скрипти та тестові дані
+├── docs/                     # Документація API
+├── storage/                  # Файлове сховище часу виконання (завантаження, результати, артефакти)
+├── models/                   # Ваги ML моделей (в gitignore)
+└── docker/                   # Налаштування Docker
 ```
 
-## Getting Started
+## Початок роботи
 
-### Prerequisites
+### Передумови
 
 - Python 3.10+
-- Node.js 18+ (for frontend)
-- SQLite (default) or PostgreSQL
+- Node.js 18+ (для фронтенду)
+- SQLite (за замовчуванням) або PostgreSQL
 
-### Backend Setup
+### Налаштування бекенду
 
 ```bash
-# Install Python dependencies
+# Встановлення Python залежностей
 pip install -r backend/requirements.txt
 
-# Start the FastAPI server (port 8000)
+# Запуск FastAPI сервера (порт 8000)
 cd ai_try_on
 python -m backend.main
 
-# Or with auto-reload for development
+# Або з автоматичним перезавантаженням для розробки
 uvicorn backend.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-### Frontend Setup
+### Налаштування фронтенду
 
 ```bash
 cd frontend
 npm install
-npm run dev    # starts on http://localhost:3000
+npm run dev    # запускається на http://localhost:3000
 ```
 
-### Environment Variables
+### Змінні оточення
 
-Copy `.env.example` to `.env` and configure:
+Скопіюйте `.env.example` у `.env` та налаштуйте:
 
-| Variable | Default | Description |
+| Змінна | За замовчуванням | Опис |
 |----------|---------|-------------|
-| `DATABASE_URL` | `file:./dev.db` | SQLite/PostgreSQL connection string |
-| `DIFFUSION_MODEL_ID` | `runwayml/stable-diffusion-v1-5` | Stable Diffusion model for refinement |
-| `DIFFUSION_DEVICE` | `cpu` | Device for inference: `cpu`, `cuda`, `mps` |
-| `QUALITY_THRESHOLD` | `0.7` | Minimum quality score (0.0–1.0) |
-| `MAX_RETRIES` | `2` | Max diffusion retry attempts |
-| `DEBUG` | `false` | Enable debug mode & artifact saving |
-| `PORT` | `8000` | Backend server port |
+| `DATABASE_URL` | `file:./dev.db` | Рядок підключення до SQLite/PostgreSQL |
+| `DIFFUSION_MODEL_ID` | `runwayml/stable-diffusion-v1-5` | Модель Stable Diffusion для покращення |
+| `DIFFUSION_DEVICE` | `cpu` | Пристрій для обчислень: `cpu`, `cuda`, `mps` |
+| `QUALITY_THRESHOLD` | `0.7` | Мінімальна оцінка якості (0.0–1.0) |
+| `MAX_RETRIES` | `2` | Максимальна кількість спроб дифузії |
+| `DEBUG` | `false` | Увімкнення режиму налагодження (debug core) та збереження артефактів |
+| `PORT` | `8000` | Порт сервера бекенду |
 
-## Key Features
+## Ключові можливості
 
-- **TPS Warping** — Thin-Plate Spline deformation aligns garments to body pose with non-linear warping (own implementation)
-- **Layered Occlusion** — Z-order compositing ensures correct arm-over-garment, head-over-all rendering
-- **Dual Refinement** — Choice of img2img or inpainting Stable Diffusion for photorealistic output
-- **Quality Gate** — Structured quality reports with per-check scores, thresholds, and retry recommendations
-- **Debug Artifacts** — Every pipeline stage saves intermediate masks, composites, and metrics for analysis
+- **Деформація TPS** — деформація Thin-Plate Spline адаптує одяг до пози тіла за допомогою нелінійного викривлення (власна реалізація)
+- **Пошарове перекриття** — Z-order композитинг забезпечує правильне відтворення (наприклад, рука над одягом, голова поверх усього)
+- **Подвійне покращення** — Вибір між img2img або inpainting в Stable Diffusion для фотореалістичного результату
+- **Контроль якості** — Структуровані звіти якості з оцінками для кожної перевірки, порогами та рекомендаціями щодо повторних спроб
+- **Артефакти налагодження** — На кожному етапі конвеєра зберігаються проміжні маски, композиції та метрики для аналізу
 
-## License
+## Ліцензія
 
-This project is developed as a diploma thesis. All rights reserved.
+Цей проект розроблено як дипломну роботу. Всі права захищено.
