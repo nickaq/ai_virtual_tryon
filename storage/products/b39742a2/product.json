@@ -1,0 +1,18 @@
+{
+  "id": "b39742a2",
+  "name": "Green Jacket (AI Mock)",
+  "category": "jacket",
+  "description": "Generated Green jacket for try-on demo.",
+  "color": "Green",
+  "images": {
+    "catalog": "/products/b39742a2/catalog.jpg",
+    "tryon": "/products/b39742a2/tryon.png",
+    "mask": "/products/b39742a2/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "slim",
+    "sleeve_type": "long",
+    "neck_type": "shirt",
+    "length": "cropped"
+  }
+}

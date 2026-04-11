@@ -1,0 +1,18 @@
+{
+  "id": "9e53ef94",
+  "name": "Red Dress (AI Mock)",
+  "category": "dress",
+  "description": "Generated Red dress for try-on demo.",
+  "color": "Red",
+  "images": {
+    "catalog": "/products/9e53ef94/catalog.jpg",
+    "tryon": "/products/9e53ef94/tryon.png",
+    "mask": "/products/9e53ef94/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "slim",
+    "sleeve_type": "short",
+    "neck_type": "v-neck",
+    "length": "normal"
+  }
+}

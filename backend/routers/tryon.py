@@ -125,11 +125,26 @@ async def upload_tryon(
     )
     db.add(user_upload)
 
+    # Resolve absolute image paths
+    project_root = Path(__file__).resolve().parent.parent.parent
+    
+    product_dir_path = project_root / "storage" / "products" / productId
+    if (product_dir_path / "tryon.png").exists():
+        prod_filename = "tryon.png"
+        prod_filepath = f"/products/{productId}/tryon.png"
+        prod_mimetype = "image/png"
+        abs_product_path = str(product_dir_path / "tryon.png")
+    else:
+        prod_filename = "product.jpg"
+        prod_filepath = f"/products/{productId}.jpg"
+        prod_mimetype = "image/jpeg"
+        abs_product_path = str(project_root / "storage" / "products" / f"{productId}.jpg")
+
     product_upload = Upload(
         id=_cuid(),
-        filename="product.jpg",
-        filepath=f"/products/{productId}.jpg",
-        mimeType="image/jpeg",
+        filename=prod_filename,
+        filepath=prod_filepath,
+        mimeType=prod_mimetype,
         size=0,
     )
     db.add(product_upload)
@@ -146,10 +161,7 @@ async def upload_tryon(
     db.commit()
     db.refresh(job)
 
-    # Resolve absolute image paths for the AI engine
-    project_root = Path(__file__).resolve().parent.parent.parent
     abs_user_path = str(project_root / "storage" / "uploads" / user_photo_path.lstrip("/"))
-    abs_product_path = str(project_root / "storage" / "products" / f"{productId}.jpg")
 
     # Fire-and-forget async processing (direct call, no HTTP self-call)
     asyncio.create_task(

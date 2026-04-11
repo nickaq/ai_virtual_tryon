@@ -1,0 +1,18 @@
+{
+  "id": "d655bcb0",
+  "name": "Blue Shirt (AI Mock)",
+  "category": "shirt",
+  "description": "Generated Blue shirt for try-on demo.",
+  "color": "Blue",
+  "images": {
+    "catalog": "/products/d655bcb0/catalog.jpg",
+    "tryon": "/products/d655bcb0/tryon.png",
+    "mask": "/products/d655bcb0/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "regular",
+    "sleeve_type": "long",
+    "neck_type": "round",
+    "length": "cropped"
+  }
+}

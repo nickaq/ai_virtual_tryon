@@ -1,0 +1,18 @@
+{
+  "id": "f7613108",
+  "name": "Green Dress (AI Mock)",
+  "category": "dress",
+  "description": "Generated Green dress for try-on demo.",
+  "color": "Green",
+  "images": {
+    "catalog": "/products/f7613108/catalog.jpg",
+    "tryon": "/products/f7613108/tryon.png",
+    "mask": "/products/f7613108/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "slim",
+    "sleeve_type": "long",
+    "neck_type": "round",
+    "length": "normal"
+  }
+}

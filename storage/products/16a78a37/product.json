@@ -1,0 +1,18 @@
+{
+  "id": "16a78a37",
+  "name": "Blue Dress (AI Mock)",
+  "category": "dress",
+  "description": "Generated Blue dress for try-on demo.",
+  "color": "Blue",
+  "images": {
+    "catalog": "/products/16a78a37/catalog.jpg",
+    "tryon": "/products/16a78a37/tryon.png",
+    "mask": "/products/16a78a37/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "oversized",
+    "sleeve_type": "none",
+    "neck_type": "v-neck",
+    "length": "normal"
+  }
+}

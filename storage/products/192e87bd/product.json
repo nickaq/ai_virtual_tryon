@@ -1,0 +1,18 @@
+{
+  "id": "192e87bd",
+  "name": "Red Jacket (AI Mock)",
+  "category": "jacket",
+  "description": "Generated Red jacket for try-on demo.",
+  "color": "Red",
+  "images": {
+    "catalog": "/products/192e87bd/catalog.jpg",
+    "tryon": "/products/192e87bd/tryon.png",
+    "mask": "/products/192e87bd/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "oversized",
+    "sleeve_type": "none",
+    "neck_type": "shirt",
+    "length": "long"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "id": "d65cc5c3",
+  "name": "Red Dress (AI Mock)",
+  "category": "dress",
+  "description": "Generated Red dress for try-on demo.",
+  "color": "Red",
+  "images": {
+    "catalog": "/products/d65cc5c3/catalog.jpg",
+    "tryon": "/products/d65cc5c3/tryon.png",
+    "mask": "/products/d65cc5c3/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "oversized",
+    "sleeve_type": "none",
+    "neck_type": "v-neck",
+    "length": "long"
+  }
+}

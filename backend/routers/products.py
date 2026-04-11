@@ -4,6 +4,7 @@ Handles listing products with filtering/pagination and fetching individual produ
 """
 import json
 import math
+from pathlib import Path
 from fastapi import APIRouter, Depends, Query, HTTPException
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
@@ -17,7 +18,7 @@ router = APIRouter(prefix="/api/products", tags=["products"])
 
 def _format_product(product: Product) -> dict:
     """Convert a Product ORM instance to a plain dict, parsing JSON-encoded fields."""
-    return {
+    base_dict = {
         "id": product.id,
         "name": product.name,
         "description": product.description,
@@ -31,7 +32,21 @@ def _format_product(product: Product) -> dict:
         "imageUrl": product.imageUrl,
         "createdAt": product.createdAt,
         "updatedAt": product.updatedAt,
+        "images": None,
+        "ai_metadata": None,
     }
+    
+    json_path = Path(__file__).resolve().parent.parent.parent / "storage" / "products" / str(product.id) / "product.json"
+    if json_path.exists():
+        try:
+            with open(json_path, "r") as f:
+                data = json.load(f)
+                base_dict["images"] = data.get("images")
+                base_dict["ai_metadata"] = data.get("ai_metadata")
+        except Exception:
+            pass
+
+    return base_dict
 
 
 @router.get("", response_model=ProductListResponse)

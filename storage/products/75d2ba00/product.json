@@ -1,0 +1,18 @@
+{
+  "id": "75d2ba00",
+  "name": "White Dress (AI Mock)",
+  "category": "dress",
+  "description": "Generated White dress for try-on demo.",
+  "color": "White",
+  "images": {
+    "catalog": "/products/75d2ba00/catalog.jpg",
+    "tryon": "/products/75d2ba00/tryon.png",
+    "mask": "/products/75d2ba00/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "oversized",
+    "sleeve_type": "long",
+    "neck_type": "none",
+    "length": "long"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "id": "e8426e38",
+  "name": "White Dress (AI Mock)",
+  "category": "dress",
+  "description": "Generated White dress for try-on demo.",
+  "color": "White",
+  "images": {
+    "catalog": "/products/e8426e38/catalog.jpg",
+    "tryon": "/products/e8426e38/tryon.png",
+    "mask": "/products/e8426e38/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "oversized",
+    "sleeve_type": "none",
+    "neck_type": "v-neck",
+    "length": "cropped"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "id": "4d58014f",
+  "name": "White T-Shirt (AI Mock)",
+  "category": "t-shirt",
+  "description": "Generated White t-shirt for try-on demo.",
+  "color": "White",
+  "images": {
+    "catalog": "/products/4d58014f/catalog.jpg",
+    "tryon": "/products/4d58014f/tryon.png",
+    "mask": "/products/4d58014f/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "regular",
+    "sleeve_type": "none",
+    "neck_type": "none",
+    "length": "normal"
+  }
+}

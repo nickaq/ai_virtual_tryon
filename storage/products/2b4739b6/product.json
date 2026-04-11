@@ -1,0 +1,18 @@
+{
+  "id": "2b4739b6",
+  "name": "Green Shirt (AI Mock)",
+  "category": "shirt",
+  "description": "Generated Green shirt for try-on demo.",
+  "color": "Green",
+  "images": {
+    "catalog": "/products/2b4739b6/catalog.jpg",
+    "tryon": "/products/2b4739b6/tryon.png",
+    "mask": "/products/2b4739b6/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "oversized",
+    "sleeve_type": "none",
+    "neck_type": "none",
+    "length": "normal"
+  }
+}

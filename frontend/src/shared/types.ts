@@ -21,7 +21,8 @@ export interface Product {
     colors: string[];
     season: ProductSeason;
     inStock: boolean;
-    images: string[];
+    imageUrl?: string;
+    images?: { catalog: string; tryon: string; mask?: string; } | string[];
 }
 
 /** A single item in the shopping cart. */

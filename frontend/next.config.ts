@@ -49,6 +49,10 @@ const nextConfig: NextConfig = {
         source: '/uploads/:path*',
         destination: `${aiServiceUrl}/uploads/:path*`,
       },
+      {
+        source: '/products/:path*',
+        destination: `${aiServiceUrl}/products/:path*`,
+      },
     ];
   },
 };

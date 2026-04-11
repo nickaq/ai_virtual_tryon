@@ -46,7 +46,7 @@ export default function ProductPage() {
                 const data = await res.json();
                 const mapped: Product = {
                     ...data,
-                    images: data.imageUrl ? [data.imageUrl] : ['/placeholder.jpg'],
+                    images: data.images || (data.imageUrl ? [data.imageUrl] : ['/placeholder.jpg']),
                 };
                 setProduct(mapped);
 
@@ -59,7 +59,7 @@ export default function ProductPage() {
                         .slice(0, 3)
                         .map((p: Record<string, unknown>) => ({
                             ...p,
-                            images: p.imageUrl ? [p.imageUrl as string] : ['/placeholder.jpg'],
+                            images: p.images || (p.imageUrl ? [p.imageUrl as string] : ['/placeholder.jpg']),
                         }));
                     setSimilarProducts(simMapped);
                 }
@@ -193,9 +193,20 @@ export default function ProductPage() {
                 <div className="product-layout">
                     <div className="product-gallery">
                         <div className="main-image">
-                            <div className="img-placeholder">
-                                <span>📸</span>
-                            </div>
+                            {(() => {
+                                const bestImage = product.images && !Array.isArray(product.images) && product.images.catalog 
+                                    ? product.images.catalog 
+                                    : product.imageUrl;
+                                
+                                if (bestImage) {
+                                    return <img src={bestImage} alt={product.name} className="product-img" style={{width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center'}} />;
+                                }
+                                return (
+                                    <div className="img-placeholder">
+                                        <span>📸</span>
+                                    </div>
+                                );
+                            })()}
                         </div>
                     </div>
 

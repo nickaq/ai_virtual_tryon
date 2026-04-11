@@ -1,0 +1,18 @@
+{
+  "id": "bcc68682",
+  "name": "Black Shirt (AI Mock)",
+  "category": "shirt",
+  "description": "Generated Black shirt for try-on demo.",
+  "color": "Black",
+  "images": {
+    "catalog": "/products/bcc68682/catalog.jpg",
+    "tryon": "/products/bcc68682/tryon.png",
+    "mask": "/products/bcc68682/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "regular",
+    "sleeve_type": "long",
+    "neck_type": "v-neck",
+    "length": "normal"
+  }
+}

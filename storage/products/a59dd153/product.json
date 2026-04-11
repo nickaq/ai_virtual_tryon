@@ -1,0 +1,18 @@
+{
+  "id": "a59dd153",
+  "name": "Red T-Shirt (AI Mock)",
+  "category": "t-shirt",
+  "description": "Generated Red t-shirt for try-on demo.",
+  "color": "Red",
+  "images": {
+    "catalog": "/products/a59dd153/catalog.jpg",
+    "tryon": "/products/a59dd153/tryon.png",
+    "mask": "/products/a59dd153/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "regular",
+    "sleeve_type": "short",
+    "neck_type": "round",
+    "length": "normal"
+  }
+}

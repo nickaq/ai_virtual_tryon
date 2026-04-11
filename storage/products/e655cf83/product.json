@@ -1,0 +1,18 @@
+{
+  "id": "e655cf83",
+  "name": "Blue Jacket (AI Mock)",
+  "category": "jacket",
+  "description": "Generated Blue jacket for try-on demo.",
+  "color": "Blue",
+  "images": {
+    "catalog": "/products/e655cf83/catalog.jpg",
+    "tryon": "/products/e655cf83/tryon.png",
+    "mask": "/products/e655cf83/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "oversized",
+    "sleeve_type": "long",
+    "neck_type": "v-neck",
+    "length": "cropped"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "id": "aac569e8",
+  "name": "Black Jacket (AI Mock)",
+  "category": "jacket",
+  "description": "Generated Black jacket for try-on demo.",
+  "color": "Black",
+  "images": {
+    "catalog": "/products/aac569e8/catalog.jpg",
+    "tryon": "/products/aac569e8/tryon.png",
+    "mask": "/products/aac569e8/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "slim",
+    "sleeve_type": "short",
+    "neck_type": "v-neck",
+    "length": "long"
+  }
+}

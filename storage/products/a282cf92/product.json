@@ -1,0 +1,18 @@
+{
+  "id": "a282cf92",
+  "name": "Black T-Shirt (AI Mock)",
+  "category": "t-shirt",
+  "description": "Generated Black t-shirt for try-on demo.",
+  "color": "Black",
+  "images": {
+    "catalog": "/products/a282cf92/catalog.jpg",
+    "tryon": "/products/a282cf92/tryon.png",
+    "mask": "/products/a282cf92/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "slim",
+    "sleeve_type": "short",
+    "neck_type": "shirt",
+    "length": "long"
+  }
+}

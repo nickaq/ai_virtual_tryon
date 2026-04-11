@@ -1,0 +1,18 @@
+{
+  "id": "896b13ad",
+  "name": "Red Jacket (AI Mock)",
+  "category": "jacket",
+  "description": "Generated Red jacket for try-on demo.",
+  "color": "Red",
+  "images": {
+    "catalog": "/products/896b13ad/catalog.jpg",
+    "tryon": "/products/896b13ad/tryon.png",
+    "mask": "/products/896b13ad/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "slim",
+    "sleeve_type": "none",
+    "neck_type": "shirt",
+    "length": "cropped"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "id": "b669a29a",
+  "name": "Black Dress (AI Mock)",
+  "category": "dress",
+  "description": "Generated Black dress for try-on demo.",
+  "color": "Black",
+  "images": {
+    "catalog": "/products/b669a29a/catalog.jpg",
+    "tryon": "/products/b669a29a/tryon.png",
+    "mask": "/products/b669a29a/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "oversized",
+    "sleeve_type": "long",
+    "neck_type": "round",
+    "length": "normal"
+  }
+}

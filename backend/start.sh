@@ -23,7 +23,6 @@ source $VENV_DIR/bin/activate
 if [ ! -f ".env" ]; then
     echo "⚠️  .env file not found. Copying from .env.example..."
     cp .env.example .env
-    echo "   Please edit .env and add your Nano Banana API key!"
 fi
 
 echo "✓ Environment activated"

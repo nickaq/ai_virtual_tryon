@@ -1,0 +1,18 @@
+{
+  "id": "cd5f851e",
+  "name": "Blue T-Shirt (AI Mock)",
+  "category": "t-shirt",
+  "description": "Generated Blue t-shirt for try-on demo.",
+  "color": "Blue",
+  "images": {
+    "catalog": "/products/cd5f851e/catalog.jpg",
+    "tryon": "/products/cd5f851e/tryon.png",
+    "mask": "/products/cd5f851e/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "oversized",
+    "sleeve_type": "none",
+    "neck_type": "none",
+    "length": "cropped"
+  }
+}

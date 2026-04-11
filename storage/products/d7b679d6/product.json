@@ -1,0 +1,18 @@
+{
+  "id": "d7b679d6",
+  "name": "Green Dress (AI Mock)",
+  "category": "dress",
+  "description": "Generated Green dress for try-on demo.",
+  "color": "Green",
+  "images": {
+    "catalog": "/products/d7b679d6/catalog.jpg",
+    "tryon": "/products/d7b679d6/tryon.png",
+    "mask": "/products/d7b679d6/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "oversized",
+    "sleeve_type": "short",
+    "neck_type": "none",
+    "length": "long"
+  }
+}

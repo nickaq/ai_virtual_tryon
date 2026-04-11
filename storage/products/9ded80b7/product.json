@@ -1,0 +1,18 @@
+{
+  "id": "9ded80b7",
+  "name": "Green Jacket (AI Mock)",
+  "category": "jacket",
+  "description": "Generated Green jacket for try-on demo.",
+  "color": "Green",
+  "images": {
+    "catalog": "/products/9ded80b7/catalog.jpg",
+    "tryon": "/products/9ded80b7/tryon.png",
+    "mask": "/products/9ded80b7/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "oversized",
+    "sleeve_type": "short",
+    "neck_type": "v-neck",
+    "length": "long"
+  }
+}

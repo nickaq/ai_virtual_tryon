@@ -5,6 +5,14 @@ from typing import Dict, Tuple, Optional
 
 # Try to import mediapipe, but provide fallback if not available (Python 3.8 compatibility)
 try:
+    import ssl
+    try:
+        _create_unverified_https_context = ssl._create_unverified_context
+    except AttributeError:
+        pass
+    else:
+        ssl._create_default_https_context = _create_unverified_https_context
+
     import mediapipe as mp
     MEDIAPIPE_AVAILABLE = True
     mp_pose = mp.solutions.pose
@@ -44,6 +52,9 @@ def detect_keypoints(image: np.ndarray, confidence_threshold: float = 0.5) -> Di
         # Convert to RGB for MediaPipe
         rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
         
+        if not MEDIAPIPE_AVAILABLE:
+            raise PoseDetectionError("MediaPipe is not installed or failed to import. Please install mediapipe.")
+            
         # Run pose detection
         with mp_pose.Pose(
             static_image_mode=True,

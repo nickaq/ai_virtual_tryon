@@ -23,6 +23,13 @@ from enum import Enum
 from typing import Optional, Dict, Any
 from PIL import Image
 
+import torch
+if not hasattr(torch, "xpu"):
+    from unittest.mock import MagicMock
+    mock_xpu = MagicMock()
+    mock_xpu.is_available.return_value = False
+    torch.xpu = mock_xpu
+
 # Import configurations
 from backend.config import settings
 from backend.models.job import ErrorCode

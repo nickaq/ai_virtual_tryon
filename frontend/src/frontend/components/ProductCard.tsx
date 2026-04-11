@@ -16,11 +16,22 @@ interface ProductCardProps {
 export default function ProductCard({ product }: ProductCardProps) {
     return (
         <Link href={`/product/${product.id}`} className="product-card">
-            {/* Product image placeholder */}
+            {/* Product image */}
             <div className="product-image">
-                <div className="img-placeholder">
-                    <span>📸</span>
-                </div>
+                {(() => {
+                    const bestImage = product.images && !Array.isArray(product.images) && product.images.catalog 
+                        ? product.images.catalog 
+                        : product.imageUrl;
+                    
+                    if (bestImage) {
+                        return <img src={bestImage} alt={product.name} className="product-img" />;
+                    }
+                    return (
+                        <div className="img-placeholder">
+                            <span>📸</span>
+                        </div>
+                    );
+                })()}
                 {!product.inStock && <div className="out-of-stock-badge">Немає в наявності</div>}
             </div>
 

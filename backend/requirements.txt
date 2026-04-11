@@ -30,9 +30,11 @@ llvmlite==0.42.0
 numba==0.59.1
 
 # Diffusion dependencies
-torch
-torchvision
-diffusers
-transformers
+# Pinned for torch 2.2.x compatibility (torch >=2.4 required by newer versions)
+torch==2.2.2
+torchvision==0.17.2
+diffusers==0.27.2
+transformers==4.40.2
+huggingface_hub==0.23.4   # last version with cached_download (removed in 0.24+)
 accelerate
 scipy

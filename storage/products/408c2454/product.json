@@ -1,0 +1,18 @@
+{
+  "id": "408c2454",
+  "name": "White Jacket (AI Mock)",
+  "category": "jacket",
+  "description": "Generated White jacket for try-on demo.",
+  "color": "White",
+  "images": {
+    "catalog": "/products/408c2454/catalog.jpg",
+    "tryon": "/products/408c2454/tryon.png",
+    "mask": "/products/408c2454/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "oversized",
+    "sleeve_type": "short",
+    "neck_type": "round",
+    "length": "cropped"
+  }
+}

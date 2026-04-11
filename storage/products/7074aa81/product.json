@@ -1,0 +1,18 @@
+{
+  "id": "7074aa81",
+  "name": "White Jacket (AI Mock)",
+  "category": "jacket",
+  "description": "Generated White jacket for try-on demo.",
+  "color": "White",
+  "images": {
+    "catalog": "/products/7074aa81/catalog.jpg",
+    "tryon": "/products/7074aa81/tryon.png",
+    "mask": "/products/7074aa81/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "regular",
+    "sleeve_type": "short",
+    "neck_type": "round",
+    "length": "normal"
+  }
+}

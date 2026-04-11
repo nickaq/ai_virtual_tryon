@@ -1,0 +1,18 @@
+{
+  "id": "ff491a90",
+  "name": "Red Jacket (AI Mock)",
+  "category": "jacket",
+  "description": "Generated Red jacket for try-on demo.",
+  "color": "Red",
+  "images": {
+    "catalog": "/products/ff491a90/catalog.jpg",
+    "tryon": "/products/ff491a90/tryon.png",
+    "mask": "/products/ff491a90/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "slim",
+    "sleeve_type": "long",
+    "neck_type": "shirt",
+    "length": "normal"
+  }
+}

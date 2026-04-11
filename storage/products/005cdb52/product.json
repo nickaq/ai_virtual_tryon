@@ -1,0 +1,18 @@
+{
+  "id": "005cdb52",
+  "name": "White Dress (AI Mock)",
+  "category": "dress",
+  "description": "Generated White dress for try-on demo.",
+  "color": "White",
+  "images": {
+    "catalog": "/products/005cdb52/catalog.jpg",
+    "tryon": "/products/005cdb52/tryon.png",
+    "mask": "/products/005cdb52/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "regular",
+    "sleeve_type": "short",
+    "neck_type": "v-neck",
+    "length": "cropped"
+  }
+}

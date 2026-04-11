@@ -1,0 +1,18 @@
+{
+  "id": "2cf34fe9",
+  "name": "Blue Shirt (AI Mock)",
+  "category": "shirt",
+  "description": "Generated Blue shirt for try-on demo.",
+  "color": "Blue",
+  "images": {
+    "catalog": "/products/2cf34fe9/catalog.jpg",
+    "tryon": "/products/2cf34fe9/tryon.png",
+    "mask": "/products/2cf34fe9/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "slim",
+    "sleeve_type": "none",
+    "neck_type": "v-neck",
+    "length": "cropped"
+  }
+}

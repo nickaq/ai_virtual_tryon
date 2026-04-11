@@ -1,0 +1,18 @@
+{
+  "id": "546adc66",
+  "name": "Blue Jacket (AI Mock)",
+  "category": "jacket",
+  "description": "Generated Blue jacket for try-on demo.",
+  "color": "Blue",
+  "images": {
+    "catalog": "/products/546adc66/catalog.jpg",
+    "tryon": "/products/546adc66/tryon.png",
+    "mask": "/products/546adc66/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "oversized",
+    "sleeve_type": "none",
+    "neck_type": "round",
+    "length": "long"
+  }
+}

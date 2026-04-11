@@ -1,0 +1,18 @@
+{
+  "id": "b07592a4",
+  "name": "Red Shirt (AI Mock)",
+  "category": "shirt",
+  "description": "Generated Red shirt for try-on demo.",
+  "color": "Red",
+  "images": {
+    "catalog": "/products/b07592a4/catalog.jpg",
+    "tryon": "/products/b07592a4/tryon.png",
+    "mask": "/products/b07592a4/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "regular",
+    "sleeve_type": "short",
+    "neck_type": "shirt",
+    "length": "long"
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "id": "a534eedd",
+  "name": "Black Shirt (AI Mock)",
+  "category": "shirt",
+  "description": "Generated Black shirt for try-on demo.",
+  "color": "Black",
+  "images": {
+    "catalog": "/products/a534eedd/catalog.jpg",
+    "tryon": "/products/a534eedd/tryon.png",
+    "mask": "/products/a534eedd/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "oversized",
+    "sleeve_type": "none",
+    "neck_type": "shirt",
+    "length": "normal"
+  }
+}

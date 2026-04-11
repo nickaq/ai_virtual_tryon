@@ -1,0 +1,18 @@
+{
+  "id": "cc9ec782",
+  "name": "Black Jacket (AI Mock)",
+  "category": "jacket",
+  "description": "Generated Black jacket for try-on demo.",
+  "color": "Black",
+  "images": {
+    "catalog": "/products/cc9ec782/catalog.jpg",
+    "tryon": "/products/cc9ec782/tryon.png",
+    "mask": "/products/cc9ec782/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "oversized",
+    "sleeve_type": "none",
+    "neck_type": "v-neck",
+    "length": "long"
+  }
+}

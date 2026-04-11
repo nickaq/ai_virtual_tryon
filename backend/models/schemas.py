@@ -20,6 +20,8 @@ class ProductOut(BaseModel):
     imageUrl: Optional[str] = None
     createdAt: Optional[datetime] = None
     updatedAt: Optional[datetime] = None
+    images: Optional[dict] = None
+    ai_metadata: Optional[dict] = None
 
     model_config = {"from_attributes": True}
 

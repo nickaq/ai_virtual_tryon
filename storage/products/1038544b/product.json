@@ -1,0 +1,18 @@
+{
+  "id": "1038544b",
+  "name": "Green T-Shirt (AI Mock)",
+  "category": "t-shirt",
+  "description": "Generated Green t-shirt for try-on demo.",
+  "color": "Green",
+  "images": {
+    "catalog": "/products/1038544b/catalog.jpg",
+    "tryon": "/products/1038544b/tryon.png",
+    "mask": "/products/1038544b/mask.png"
+  },
+  "ai_metadata": {
+    "fit": "regular",
+    "sleeve_type": "long",
+    "neck_type": "round",
+    "length": "long"
+  }
+}
