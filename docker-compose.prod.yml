@@ -1,0 +1,68 @@
+version: "3.8"
+
+# Production Docker Compose с поддержкой env файлов и secrets
+# Использование:
+#   docker-compose -f docker-compose.prod.yml up -d
+#
+# Для передачи .env на сервер:
+#   1. Скопируй .env на сервер: scp .env user@server:/opt/ai_try_on/
+#   2. Или установи переменные окружения на сервере
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    image: ai-tryon-backend:latest
+    container_name: ai-tryon-backend
+    # Загружаем env из файла (файл должен существовать на сервере)
+    env_file:
+      - .env
+    environment:
+      # Эти переменные перекрывают .env если нужно
+      - HOST=0.0.0.0
+      - PORT=8000
+      - STORAGE_PATH=/app/storage
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    volumes:
+      - ./storage:/app/storage
+      - ./logs:/app/logs
+      - ./models:/app/models:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - ai-tryon-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    image: ai-tryon-frontend:latest
+    container_name: ai-tryon-frontend
+    environment:
+      - AI_SERVICE_URL=http://backend:8000
+      - NEXT_TELEMETRY_DISABLED=1
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - ai-tryon-network
+
+networks:
+  ai-tryon-network:
+    driver: bridge
+
+volumes:
+  storage:
+    driver: local
+  logs:
+    driver: local

@@ -1,0 +1,63 @@
+version: "3.8"
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.backend
+    container_name: ai-tryon-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./storage:/app/storage
+      - ./logs:/app/logs
+      - ./models:/app/models:ro
+    environment:
+      - HOST=0.0.0.0
+      - PORT=8000
+      - STORAGE_PATH=/app/storage
+      - DIFFUSION_DEVICE=cuda
+      - DEBUG=false
+      - SAVE_DEBUG_ARTIFACTS=false
+      - MAX_IMAGE_SIZE_MB=10
+      - MAX_IMAGE_DIMENSION=2048
+      - WORK_IMAGE_SIZE=1536
+      - QUALITY_THRESHOLD=0.7
+      - MAX_RETRIES=2
+      - WORKERS=1
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    restart: unless-stopped
+    networks:
+      - ai-tryon-network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.frontend
+    container_name: ai-tryon-frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - AI_SERVICE_URL=http://backend:8000
+      - NEXT_TELEMETRY_DISABLED=1
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - ai-tryon-network
+
+networks:
+  ai-tryon-network:
+    driver: bridge
+
+volumes:
+  storage:
+    driver: local
+  logs:
+    driver: local
