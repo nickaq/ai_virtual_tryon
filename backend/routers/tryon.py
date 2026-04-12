@@ -161,7 +161,7 @@ async def upload_tryon(
     db.commit()
     db.refresh(job)
 
-    abs_user_path = str(project_root / "storage" / "uploads" / user_photo_path.lstrip("/"))
+    abs_user_path = str(project_root / "storage" / user_photo_path.lstrip("/"))
 
     # Fire-and-forget async processing (direct call, no HTTP self-call)
     asyncio.create_task(

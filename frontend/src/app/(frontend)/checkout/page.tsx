@@ -40,6 +40,7 @@ export default function CheckoutPage() {
         e.preventDefault();
         if (step < 3) {
             setStep(step + 1);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
             return;
         }
 
@@ -90,31 +91,33 @@ export default function CheckoutPage() {
     return (
         <div className="checkout-page">
             <div className="container">
-                <h1>Оформлення замовлення</h1>
+                <h1 className="reveal">Оформлення <span className="gradient-text">Замовлення</span></h1>
 
                 {/* Step indicator */}
-                <div className="checkout-steps">
+                <div className="checkout-steps reveal">
                     <div className={`step ${step >= 1 ? 'active' : ''}`}>
-                        <div className="step-number">1</div>
-                        <span>Контактні дані</span>
+                        <div className="step-number">01</div>
+                        <span>Контакт</span>
                     </div>
                     <div className={`step ${step >= 2 ? 'active' : ''}`}>
-                        <div className="step-number">2</div>
+                        <div className="step-number">02</div>
                         <span>Доставка</span>
                     </div>
                     <div className={`step ${step >= 3 ? 'active' : ''}`}>
-                        <div className="step-number">3</div>
-                        <span>Підтвердження</span>
+                        <div className="step-number">03</div>
+                        <span>Оплата</span>
                     </div>
                 </div>
 
                 {/* Error banner */}
                 {orderError && (
-                    <div className="checkout-error"><p>{orderError}</p></div>
+                    <div className="checkout-error reveal">
+                        <p>{orderError}</p>
+                    </div>
                 )}
 
                 <div className="checkout-layout">
-                    <form className="checkout-form" onSubmit={handleSubmit}>
+                    <form className="checkout-form reveal" onSubmit={handleSubmit}>
                         {/* Step 1 — Contact info */}
                         {step === 1 && (
                             <div className="form-section">
@@ -122,7 +125,7 @@ export default function CheckoutPage() {
                                 <div className="form-grid">
                                     <input type="text" name="name" placeholder="Повне ім'я *" value={formData.name} onChange={handleChange} required />
                                     <input type="email" name="email" placeholder="Email *" value={formData.email} onChange={handleChange} required />
-                                    <input type="tel" name="phone" placeholder="Телефон *" value={formData.phone} onChange={handleChange} required />
+                                    <input type="tel" name="phone" placeholder="Телефон *" value={formData.phone} onChange={handleChange} required style={{ gridColumn: '1 / -1' }} />
                                 </div>
                                 <button type="submit" className="btn btn-primary btn-lg">Продовжити</button>
                             </div>
@@ -148,23 +151,21 @@ export default function CheckoutPage() {
                         {/* Step 3 — Confirmation */}
                         {step === 3 && (
                             <div className="form-section">
-                                <h2>Підтвердження замовлення</h2>
+                                <h2>Підтвердження</h2>
                                 <div className="confirmation-details">
                                     <div className="detail-group">
-                                        <h3>Контактні дані</h3>
+                                        <h3>Отримувач</h3>
                                         <p>{formData.name}</p>
-                                        <p>{formData.email}</p>
-                                        <p>{formData.phone}</p>
+                                        <p>{formData.email} • {formData.phone}</p>
                                     </div>
                                     <div className="detail-group">
-                                        <h3>Адреса доставки</h3>
+                                        <h3>Доставка</h3>
                                         <p>{formData.address}</p>
-                                        <p>{formData.city}, {formData.postalCode}</p>
-                                        <p>{formData.country}</p>
+                                        <p>{formData.city}, {formData.postalCode}, {formData.country}</p>
                                     </div>
                                     <div className="payment-stub">
-                                        <h3>Оплата</h3>
-                                        <p className="payment-note">💳 Оплата при отриманні (заглушка)</p>
+                                        <h3>Метод оплати</h3>
+                                        <p className="payment-note">💳 Оплата картою при отриманні</p>
                                     </div>
                                 </div>
                                 <div className="form-actions">
@@ -178,7 +179,7 @@ export default function CheckoutPage() {
                     </form>
 
                     {/* Order summary sidebar */}
-                    <div className="order-summary">
+                    <aside className="order-summary reveal">
                         <h2>Ваше замовлення</h2>
                         <div className="summary-items">
                             {items.map((item) => (
@@ -198,14 +199,14 @@ export default function CheckoutPage() {
                             </div>
                             <div className="summary-row">
                                 <span>Доставка</span>
-                                <span>Безкоштовно</span>
+                                <span style={{ color: 'var(--primary)', fontWeight: 800 }}>Безкоштовно</span>
                             </div>
                             <div className="summary-total">
                                 <span>Разом</span>
                                 <span>€{getTotal().toFixed(2)}</span>
                             </div>
                         </div>
-                    </div>
+                    </aside>
                 </div>
             </div>
         </div>

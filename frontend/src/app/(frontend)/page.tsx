@@ -13,7 +13,6 @@ import './page.css';
 export default function Home() {
     const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
 
-    // Fetch the first 6 products for the "Featured" section
     useEffect(() => {
         async function loadFeatured() {
             try {
@@ -37,28 +36,27 @@ export default function Home() {
             {/* Hero Section */}
             <section className="hero">
                 <div className="container hero-content">
-                    <div className="hero-text">
+                    <div className="hero-text reveal">
                         <h1 className="hero-title">
-                            Відкрийте для себе
-                            <br />
-                            <span className="gradient-text">нову еру моди</span>
+                            Стиль <br />
+                            <span className="gradient-text">майбутнього</span>
                         </h1>
                         <p className="hero-description">
-                            Унікальний магазин з AI-стилістом та віртуальним примірюванням.
-                            Підбирайте ідеальний образ за допомогою штучного інтелекту.
+                            Досліджуйте моду за допомогою штучного інтелекту. 
+                            Віртуальне примірювання, персональні рекомендації та унікальні колекції.
                         </p>
                         <div className="hero-actions">
                             <Link href="/catalog" className="btn btn-primary btn-lg">
-                                Дивитись каталог
+                                Перейти до каталогу
                             </Link>
-                            <Link href="/stylist" className="btn btn-secondary btn-lg">
-                                🤖 AI Стиліст
+                            <Link href="/tryon" className="btn btn-secondary btn-lg">
+                                Спробувати AI
                             </Link>
                         </div>
                     </div>
-                    <div className="hero-visual">
+                    <div className="hero-visual reveal">
                         <div className="hero-card">
-                            <div className="img-placeholder hero-image">
+                            <div className="hero-image">
                                 <span>✨</span>
                             </div>
                         </div>
@@ -70,35 +68,35 @@ export default function Home() {
             <section className="features">
                 <div className="container">
                     <div className="features-grid">
-                        <div className="feature-card">
-                            <div className="feature-icon">🤖</div>
-                            <h3>AI Стиліст</h3>
-                            <p>Персональний AI-асистент допоможе підібрати ідеальний образ за вашими вподобаннями</p>
+                        <div className="feature-card reveal">
+                            <span className="feature-icon">🤖</span>
+                            <h3>AI Технології</h3>
+                            <p>Ми використовуємо передові нейромережі для ідеального поєднання стилю та комфорту.</p>
                         </div>
-                        <div className="feature-card">
-                            <div className="feature-icon">👔</div>
-                            <h3>Віртуальне примірювання</h3>
-                            <p>Спробуйте одяг віртуально перед покупкою за допомогою технології AI</p>
+                        <div className="feature-card reveal">
+                            <span className="feature-icon">👔</span>
+                            <h3>Віртуальна примірка</h3>
+                            <p>Побачте, як одяг сидить на вас, не виходячи з дому, завдяки технології AI Vision.</p>
                         </div>
-                        <div className="feature-card">
-                            <div className="feature-icon">⚡</div>
-                            <h3>Швидка доставка</h3>
-                            <p>Доставка по всій Європі від 2 днів</p>
+                        <div className="feature-card reveal">
+                            <span className="feature-icon">⚡</span>
+                            <h3>Ексклюзивність</h3>
+                            <p>Колекції, що створюються за участю AI стилістів спеціально для поціновувачів інновацій.</p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            {/* Featured Products (loaded from API) */}
+            {/* Featured Products */}
             <section className="featured-products">
                 <div className="container">
-                    <div className="section-header">
-                        <h2>Обрані товари</h2>
+                    <div className="section-header reveal">
+                        <h2>Нова Колекція</h2>
                         <Link href="/catalog" className="view-all-link">
-                            Дивитись всі →
+                            Дивитись все &mdash;
                         </Link>
                     </div>
-                    <div className="products-grid">
+                    <div className="products-grid reveal">
                         {featuredProducts.map(product => (
                             <ProductCard key={product.id} product={product} />
                         ))}
@@ -107,16 +105,15 @@ export default function Home() {
             </section>
 
             {/* CTA Section */}
-            <section className="cta-section">
+            <section className="cta-section reveal">
                 <div className="container">
                     <div className="cta-card">
-                        <h2>Спробуйте AI Стиліста</h2>
+                        <h2>Готові до змін?</h2>
                         <p>
-                            Наш розумний асистент враховує ваш бюджет, стиль та вподобання,
-                            щоб створити ідеальний образ спеціально для вас.
+                            Приєднуйтесь до тисяч користувачів, які вже змінили свій підхід до шопінгу разом зі StyleAI.
                         </p>
-                        <Link href="/stylist" className="btn btn-primary btn-lg">
-                            Почати підбір
+                        <Link href="/tryon" className="btn btn-primary btn-lg">
+                            Почати примірювання
                         </Link>
                     </div>
                 </div>

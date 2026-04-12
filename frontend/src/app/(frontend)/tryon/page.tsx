@@ -89,55 +89,55 @@ function TryOnContent() {
 
     return (
         <div className="tryon-page">
-            <div className="tryon-container">
+            <div className="tryon-container container">
                 {/* Header */}
-                <div className="tryon-header">
-                    <h1>Virtual Try-On</h1>
-                    <p>See how clothes look on you with AI-powered virtual try-on</p>
+                <div className="tryon-header reveal">
+                    <h1>Віртуальна <span className="gradient-text">Примірка</span></h1>
+                    <p>Відчуйте майбутнє шопінгу з нашою передовою технологією AI Vision.</p>
                 </div>
 
                 {/* Error banner */}
                 {error && (
-                    <div className="tryon-error">
-                        <p className="error-title">Error</p>
+                    <div className="tryon-error reveal">
+                        <p className="error-title">Помилка</p>
                         <p className="error-text">{error}</p>
                     </div>
                 )}
 
                 {/* Upload form */}
                 {showForm ? (
-                    <div className="tryon-form-card">
+                    <div className="tryon-form-card reveal">
                         {/* Image upload grid */}
                         <div className="tryon-upload-grid">
-                            <TryOnUploader label="Your Photo" onImageSelect={handleUserImageSelect} currentImage={userImage} />
-                            <TryOnUploader label="Product Image" onImageSelect={(f) => setProductImage(f)} currentImage={productImage} />
+                            <TryOnUploader label="Ваше фото" onImageSelect={handleUserImageSelect} currentImage={userImage} />
+                            <TryOnUploader label="Фото товару" onImageSelect={(f) => setProductImage(f)} currentImage={productImage} />
                         </div>
 
                         {/* Processing options */}
                         <div className="tryon-options-grid">
                             <div>
-                                <label className="tryon-option-label">Garment Type (Optional)</label>
+                                <label className="tryon-option-label">Тип одягу</label>
                                 <select value={garmentType} onChange={(e) => setGarmentType(e.target.value)} className="tryon-select">
-                                    <option value="">Auto-detect</option>
-                                    <option value="tshirt">T-Shirt</option>
-                                    <option value="shirt">Shirt</option>
-                                    <option value="jacket">Jacket</option>
-                                    <option value="hoodie">Hoodie</option>
-                                    <option value="dress">Dress</option>
-                                    <option value="pants">Pants</option>
+                                    <option value="">Авто-визначення</option>
+                                    <option value="tshirt">Футболка</option>
+                                    <option value="shirt">Сорочка</option>
+                                    <option value="jacket">Піджак/Куртка</option>
+                                    <option value="hoodie">Худі</option>
+                                    <option value="dress">Сукня</option>
+                                    <option value="pants">Штани</option>
                                 </select>
                             </div>
 
                             <div>
-                                <label className="tryon-option-label">Processing Mode</label>
+                                <label className="tryon-option-label">Режим обробки</label>
                                 <select value={mode} onChange={(e) => setMode(e.target.value as 'draft' | 'final')} className="tryon-select">
-                                    <option value="final">Final (Photorealistic)</option>
-                                    <option value="draft">Draft (Fast Preview)</option>
+                                    <option value="final">Фінальний (Фотореалізм)</option>
+                                    <option value="draft">Чернетка (Швидко)</option>
                                 </select>
                             </div>
 
                             <div>
-                                <label className="tryon-option-label">Realism Level: {realismLevel}</label>
+                                <label className="tryon-option-label">Рівень деталізації: {realismLevel}</label>
                                 <div className="tryon-range-wrapper">
                                     <input
                                         type="range" min="1" max="5"
@@ -146,8 +146,8 @@ function TryOnContent() {
                                         disabled={mode === 'draft'}
                                     />
                                     <div className="tryon-range-labels">
-                                        <span>Fast</span>
-                                        <span>Detailed</span>
+                                        <span>Швидко</span>
+                                        <span>Детально</span>
                                     </div>
                                 </div>
                             </div>
@@ -158,18 +158,17 @@ function TryOnContent() {
                             <button
                                 onClick={handleSubmit}
                                 disabled={!userImage || !productImage || isSubmitting}
-                                className="tryon-submit-btn"
+                                className="tryon-submit-btn btn btn-primary btn-lg"
                             >
                                 {isSubmitting ? (
                                     <span className="tryon-submit-content">
                                         <div className="tryon-submit-spinner"></div>
-                                        Processing...
+                                        Обробка...
                                     </span>
-                                ) : 'Try On Now'}
+                                ) : 'Почати примірювання'}
                             </button>
+                            <p className="tryon-info-text">Обробка зазвичай триває від 10 до 30 секунд</p>
                         </div>
-
-                        <p className="tryon-info-text">Processing typically takes 10-30 seconds</p>
                     </div>
                 ) : null}
 
@@ -178,25 +177,25 @@ function TryOnContent() {
                     <TryOnResult status={jobStatus} userImagePreview={userImagePreview || undefined} />
                 )}
 
-                {/* "How it works" explainer (shown only before a job is submitted) */}
+                {/* "How it works" explainer */}
                 {!jobStatus && (
-                    <div className="tryon-how-it-works">
-                        <h2>How It Works</h2>
+                    <div className="tryon-how-it-works reveal">
+                        <h2>Як це працює</h2>
                         <div className="tryon-steps-grid">
                             <div className="tryon-step">
                                 <div className="tryon-step-number">1</div>
-                                <h3>Upload Your Photo</h3>
-                                <p>Take a selfie or upload a full-body photo with good lighting</p>
+                                <h3>Завантажте фото</h3>
+                                <p>Зробіть селфі або завантажте фото у повний зріст при хорошому освітленні.</p>
                             </div>
                             <div className="tryon-step">
                                 <div className="tryon-step-number">2</div>
-                                <h3>Select Product</h3>
-                                <p>Choose the clothing item you want to try on</p>
+                                <h3>Оберіть товар</h3>
+                                <p>Виберіть річ, яку хочете приміряти, з нашого великого каталогу.</p>
                             </div>
                             <div className="tryon-step">
                                 <div className="tryon-step-number">3</div>
-                                <h3>See the Result</h3>
-                                <p>AI generates a photorealistic image with you wearing the product</p>
+                                <h3>Отримайте результат</h3>
+                                <p>Наш AI згенерує реалістичне зображення вас у новому образі.</p>
                             </div>
                         </div>
                     </div>

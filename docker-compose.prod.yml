@@ -28,7 +28,17 @@ services:
     volumes:
       - ./storage:/app/storage
       - ./logs:/app/logs
-      - ./models:/app/models:ro
+      - ./models:/app/models:rw
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s

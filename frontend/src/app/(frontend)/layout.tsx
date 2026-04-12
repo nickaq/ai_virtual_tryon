@@ -3,27 +3,27 @@
  * Loads fonts, wraps children in CartProvider, and renders Header + Footer.
  */
 import type { Metadata } from "next";
-import { Inter, Outfit } from "next/font/google";
+import { Inter, Syne } from "next/font/google";
 import { CartProvider } from "@/frontend/lib/cartContext";
 import Header from "@/frontend/components/Header";
 import Footer from "@/frontend/components/Footer";
 import "./globals.css";
 
-// Google Fonts — Inter for body copy, Outfit for headings
+// Google Fonts — Inter for body copy, Syne for professional avant-garde headings
 const inter = Inter({
     variable: "--font-inter",
     subsets: ["latin", "cyrillic"],
 });
 
-const outfit = Outfit({
-    variable: "--font-outfit",
+const syne = Syne({
+    variable: "--font-syne",
     subsets: ["latin"],
 });
 
 // Page-level metadata (title & description)
 export const metadata: Metadata = {
-    title: "StyleAI - AI-Powered Fashion Store",
-    description: "Магазин одежды с AI стилістом та віртуальним примірюванням",
+    title: "StyleAI | Future of Fashion",
+    description: "Персональний AI-стиліст та віртуальне примірювання одягу майбутнього.",
 };
 
 export default function RootLayout({
@@ -33,7 +33,7 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="ru">
-            <body className={`${inter.variable} ${outfit.variable}`} suppressHydrationWarning>
+            <body className={`${inter.variable} ${syne.variable}`} suppressHydrationWarning>
                 <CartProvider>
                     <Header />
                     <main>{children}</main>

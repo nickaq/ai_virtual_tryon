@@ -1,6 +1,7 @@
-FROM python:3.10-slim-bookworm
+FROM pytorch/pytorch:2.2.2-cuda12.1-cudnn8-runtime
 
 # Install system dependencies
+# libgl1-mesa-glx and other libs are required for OpenCV and MediaPipe
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     cmake \
@@ -11,7 +12,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libxext6 \
     libxrender-dev \
     libgomp1 \
-    libglib2.0-0 \
     libgtk-3-0 \
     libnss3 \
     libxcomposite1 \
@@ -36,6 +36,8 @@ WORKDIR /app
 COPY backend/requirements.txt .
 
 # Install Python dependencies
+# We use --extra-index-url if needed, but since we use the pytorch image, we mainly need the other libs
+# requirements.txt specifies torch==2.2.2 which is already in the base image, but we run install to be sure of other deps
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy backend code
@@ -44,6 +46,10 @@ COPY ai/ ./ai/
 
 # Create necessary directories
 RUN mkdir -p storage uploads products results artifacts logs models
+
+# Set environment variables for GPU usage
+ENV NVIDIA_VISIBLE_DEVICES=all
+ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
 
 # Expose port
 EXPOSE 8000
