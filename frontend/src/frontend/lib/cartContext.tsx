@@ -43,21 +43,27 @@ export const useCart = () => {
 /** Wraps the app to provide shopping cart state and persistence. */
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [items, setItems] = useState<CartItem[]>([]);
+    const [isHydrated, setIsHydrated] = useState(false);
 
     // Restore cart from localStorage on mount
     useEffect(() => {
         const savedCart = localStorage.getItem('cart');
         if (savedCart) {
-            requestAnimationFrame(() => {
+            try {
                 setItems(JSON.parse(savedCart));
-            });
+            } catch {
+                // Ignore malformed JSON
+            }
         }
+        setIsHydrated(true);
     }, []);
 
-    // Persist cart to localStorage on every change
+    // Persist cart to localStorage on every change (only after hydration)
     useEffect(() => {
-        localStorage.setItem('cart', JSON.stringify(items));
-    }, [items]);
+        if (isHydrated) {
+            localStorage.setItem('cart', JSON.stringify(items));
+        }
+    }, [items, isHydrated]);
 
     /** Add a product to the cart (or increment if already present). */
     const addToCart = (product: Product, size: string, color: string, quantity: number = 1) => {

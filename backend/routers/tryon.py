@@ -140,14 +140,16 @@ async def upload_tryon(
         prod_mimetype = "image/jpeg"
         abs_product_path = str(project_root / "storage" / "products" / f"{productId}.jpg")
 
-    product_upload = Upload(
-        id=_cuid(),
-        filename=prod_filename,
-        filepath=prod_filepath,
-        mimeType=prod_mimetype,
-        size=0,
-    )
-    db.add(product_upload)
+    product_upload = db.query(Upload).filter(Upload.filepath == prod_filepath).first()
+    if not product_upload:
+        product_upload = Upload(
+            id=_cuid(),
+            filename=prod_filename,
+            filepath=prod_filepath,
+            mimeType=prod_mimetype,
+            size=0,
+        )
+        db.add(product_upload)
 
     # Create the TryOnJob record
     job = TryOnJob(

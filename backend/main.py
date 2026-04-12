@@ -9,7 +9,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from contextlib import asynccontextmanager
 import logging
-from pathlib import Path
 from pydantic import ValidationError
 
 from .config import settings
@@ -85,14 +84,10 @@ app.mount("/results", StaticFiles(directory=str(settings.results_path)), name="r
 app.mount("/artifacts", StaticFiles(directory=str(settings.artifacts_path)), name="artifacts")
 
 # Монтування завантажень для обслуговування завантажених файлів
-uploads_dir = Path("./storage/uploads")
-uploads_dir.mkdir(parents=True, exist_ok=True)
-app.mount("/uploads", StaticFiles(directory=str(uploads_dir)), name="uploads")
+app.mount("/uploads", StaticFiles(directory=str(settings.uploads_path)), name="uploads")
 
 # Монтування товарів
-products_dir = Path("./storage/products")
-products_dir.mkdir(parents=True, exist_ok=True)
-app.mount("/products", StaticFiles(directory=str(products_dir)), name="products")
+app.mount("/products", StaticFiles(directory=str(settings.products_path)), name="products")
 
 
 @app.get("/")

@@ -1,7 +1,7 @@
 """In-memory job queue management."""
 import asyncio
 from typing import Dict, Optional
-from datetime import datetime
+from datetime import datetime, timezone
 
 from backend.models.job import Job, JobStatus
 
@@ -64,7 +64,7 @@ class JobQueue:
             job: Updated job
         """
         async with self.lock:
-            job.updated_at = datetime.utcnow()
+            job.updated_at = datetime.now(timezone.utc)
             self.jobs[job.job_id] = job
     
     async def requeue_job(self, job_id: str):

@@ -179,7 +179,7 @@ async def _refine_with_img2img(
         params["base_strength"] + params["strength_increment"] * (realism_level - 1)
     )
     
-    init_image = Image.fromarray(draft_composite)
+    init_image = Image.fromarray(cv2.cvtColor(draft_composite, cv2.COLOR_BGR2RGB))
     
     print(f"  [img2img] Strength: {strength:.2f}, Guidance: {params['guidance_scale']}")
     
@@ -192,7 +192,7 @@ async def _refine_with_img2img(
         num_inference_steps=params["num_inference_steps"]
     ).images
     
-    return np.array(result_imgs[0])
+    return cv2.cvtColor(np.array(result_imgs[0]), cv2.COLOR_RGB2BGR)
 
 
 async def _refine_with_inpainting(
@@ -215,10 +215,10 @@ async def _refine_with_inpainting(
     )
     
     # Prepare PIL images
-    init_image = Image.fromarray(draft_composite)
+    init_image = Image.fromarray(cv2.cvtColor(draft_composite, cv2.COLOR_BGR2RGB))
     
     # Inpainting mask: white = region to regenerate (garment area)
-    mask_image = Image.fromarray(garment_mask).convert("RGB")
+    mask_image = Image.fromarray(garment_mask).convert("L")
     
     print(f"  [inpainting] Strength: {strength:.2f}, Guidance: {params['guidance_scale']}")
     
@@ -232,7 +232,7 @@ async def _refine_with_inpainting(
         num_inference_steps=params["num_inference_steps"]
     ).images
     
-    return np.array(result_imgs[0])
+    return cv2.cvtColor(np.array(result_imgs[0]), cv2.COLOR_RGB2BGR)
 
 
 async def refine_image_with_diffusion(
