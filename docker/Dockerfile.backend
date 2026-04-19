@@ -1,5 +1,8 @@
 FROM pytorch/pytorch:2.2.2-cuda12.1-cudnn8-runtime
 
+# Проверить что используется Python 3.10
+RUN python --version | grep -q "3.10" || (echo "ERROR: Python 3.10 required, got $(python --version)" && exit 1)
+
 # Install system dependencies
 # libgl1-mesa-glx and other libs are required for OpenCV and MediaPipe
 RUN apt-get update && apt-get install -y --no-install-recommends \

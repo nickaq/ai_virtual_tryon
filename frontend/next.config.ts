@@ -39,8 +39,8 @@ const nextConfig: NextConfig = {
         destination: `${aiServiceUrl}/api/uploads`,
       },
       {
-        source: '/api/tryon/:path*',
-        destination: `${aiServiceUrl}/api/tryon/:path*`,
+        source: '/ai/tryon/:path*',
+        destination: `${aiServiceUrl}/ai/tryon/:path*`,
       },
       {
         source: '/results/:path*',

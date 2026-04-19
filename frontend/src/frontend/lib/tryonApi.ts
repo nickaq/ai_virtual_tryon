@@ -94,15 +94,18 @@ export async function submitTryOnJob(request: TryOnJobRequest): Promise<TryOnJob
 
     // Optional processing parameters
     if (request.productId) formData.append('product_id', request.productId);
-    if (request.garmentType) formData.append('garment_type', request.garmentType);
-    if (request.mode) formData.append('mode', request.mode);
+    if (request.garmentType) formData.append('cloth_category', request.garmentType);
+    if (request.mode) {
+        const generationMode = request.mode === 'draft' ? 'fast' : 'quality';
+        formData.append('generation_mode', generationMode);
+    }
     if (request.preserveFace !== undefined) formData.append('preserve_face', String(request.preserveFace));
     if (request.preserveBackground !== undefined) formData.append('preserve_background', String(request.preserveBackground));
     if (request.realismLevel) formData.append('realism_level', String(request.realismLevel));
     if (request.maxRetries !== undefined) formData.append('max_retries', String(request.maxRetries));
 
     try {
-        const response = await fetch(`${API_BASE_URL}/api/tryon/submit`, {
+        const response = await fetch(`${API_BASE_URL}/ai/tryon/submit`, {
             method: 'POST',
             body: formData,
         });
@@ -130,7 +133,7 @@ export async function submitTryOnJob(request: TryOnJobRequest): Promise<TryOnJob
 /** Check the current status of a try-on job by its ID. */
 export async function checkJobStatus(jobId: string): Promise<TryOnStatusResponse> {
     try {
-        const response = await fetch(`${API_BASE_URL}/api/tryon/status/${jobId}`);
+        const response = await fetch(`${API_BASE_URL}/ai/tryon/status/${jobId}`);
 
         if (!response.ok) {
             const error = await response.json().catch(() => ({}));
@@ -154,7 +157,7 @@ export async function checkJobStatus(jobId: string): Promise<TryOnStatusResponse
 
 /** Build the full URL for downloading a result image. */
 export function getResultImageUrl(jobId: string): string {
-    return `${API_BASE_URL}/api/tryon/result/${jobId}`;
+    return `${API_BASE_URL}/ai/tryon/result/${jobId}`;
 }
 
 /**
