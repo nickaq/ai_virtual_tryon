@@ -1,58 +1,61 @@
-FROM pytorch/pytorch:2.2.2-cuda12.1-cudnn8-runtime
+FROM pytorch/pytorch:2.2.2-cuda12.1-cudnn8-devel
 
 # Проверить что используется Python 3.10
 RUN python --version | grep -q "3.10" || (echo "ERROR: Python 3.10 required, got $(python --version)" && exit 1)
 
 # Install system dependencies
-# libgl1-mesa-glx and other libs are required for OpenCV and MediaPipe
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     cmake \
     curl \
+    git \
+    wget \
     libgl1-mesa-glx \
     libglib2.0-0 \
     libsm6 \
     libxext6 \
     libxrender-dev \
     libgomp1 \
-    libgtk-3-0 \
-    libnss3 \
-    libxcomposite1 \
-    libxcursor1 \
-    libxdamage1 \
-    libxi6 \
-    libxtst6 \
-    libappindicator3-1 \
-    libasound2 \
-    libatk1.0-0 \
-    libatk-bridge2.0-0 \
-    libcups2 \
-    libdrm2 \
-    libgbm1 \
-    libnspr4 \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
 WORKDIR /app
 
-# Copy requirements first for better caching
-COPY backend/requirements.txt .
+# ── 1. Install detectron2 (required for DensePose) ──
+RUN pip install --no-cache-dir 'git+https://github.com/facebookresearch/detectron2.git'
 
-# Install Python dependencies
-# We use --extra-index-url if needed, but since we use the pytorch image, we mainly need the other libs
-# requirements.txt specifies torch==2.2.2 which is already in the base image, but we run install to be sure of other deps
+# ── 2. Clone IDM-VTON and download preprocessing checkpoints ──
+ENV IDM_VTON_PATH=/app/IDM-VTON
+RUN git clone --depth 1 https://github.com/yisol/IDM-VTON.git ${IDM_VTON_PATH}
+
+RUN mkdir -p ${IDM_VTON_PATH}/ckpt/densepose \
+             ${IDM_VTON_PATH}/ckpt/humanparsing \
+             ${IDM_VTON_PATH}/ckpt/openpose/ckpts && \
+    wget -q -O ${IDM_VTON_PATH}/ckpt/densepose/model_final_162be9.pkl \
+        "https://huggingface.co/spaces/yisol/IDM-VTON/resolve/main/ckpt/densepose/model_final_162be9.pkl" && \
+    wget -q -O ${IDM_VTON_PATH}/ckpt/humanparsing/parsing_atr.onnx \
+        "https://huggingface.co/spaces/yisol/IDM-VTON/resolve/main/ckpt/humanparsing/parsing_atr.onnx" && \
+    wget -q -O ${IDM_VTON_PATH}/ckpt/humanparsing/parsing_lip.onnx \
+        "https://huggingface.co/spaces/yisol/IDM-VTON/resolve/main/ckpt/humanparsing/parsing_lip.onnx" && \
+    wget -q -O ${IDM_VTON_PATH}/ckpt/openpose/ckpts/body_pose_model.pth \
+        "https://huggingface.co/spaces/yisol/IDM-VTON/resolve/main/ckpt/openpose/ckpts/body_pose_model.pth"
+
+# ── 3. Install Python dependencies ──
+COPY backend/requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy backend code
+# ── 4. Copy application code ──
 COPY backend/ ./backend/
 COPY ai/ ./ai/
+COPY scripts/ ./scripts/
 
 # Create necessary directories
 RUN mkdir -p storage uploads products results artifacts logs models
 
-# Set environment variables for GPU usage
+# Set environment variables
 ENV NVIDIA_VISIBLE_DEVICES=all
 ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
+ENV PYTHONPATH="/app:${IDM_VTON_PATH}:${PYTHONPATH}"
 
 # Expose port
 EXPOSE 8000

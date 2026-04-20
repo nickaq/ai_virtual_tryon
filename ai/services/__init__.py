@@ -1,14 +1,10 @@
-"""Services package."""
+"""Services package — IDM-VTON pipeline."""
 
 __all__ = [
+    # Core pipeline (IDM-VTON)
     "image_loader",
-    "segmentation",
-    "pose_detector",
-    "garment_prep",
-    "tps_warp",
-    "occlusion",
-    "alignment",
-    "quality_control",
-    "diffusion",
+    "preprocessing",
+    "vton_inference",
+    "postcheck",
     "storage",
 ]
