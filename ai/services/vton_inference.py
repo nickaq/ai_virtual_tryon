@@ -78,7 +78,7 @@ def _load_pipeline():
         model_id, subfolder="image_encoder", torch_dtype=dtype
     )
     unet_encoder = UNet2DConditionModel_ref.from_pretrained(
-        model_id, subfolder="unet_encoder", torch_dtype=dtype
+        model_id, subfolder="unet_encoder", torch_dtype=dtype, use_safetensors=True
     )
     text_encoder_one = CLIPTextModel.from_pretrained(
         model_id, subfolder="text_encoder", torch_dtype=dtype
