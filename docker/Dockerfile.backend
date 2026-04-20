@@ -21,8 +21,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Set working directory
 WORKDIR /app
 
-# ── 1. Install detectron2 (required for DensePose) ──
+# ── 1. Install detectron2 + DensePose ──
 RUN pip install --no-cache-dir 'git+https://github.com/facebookresearch/detectron2.git'
+RUN pip install --no-cache-dir 'git+https://github.com/facebookresearch/detectron2@main#subdirectory=projects/DensePose'
 
 # ── 2. Clone IDM-VTON and download preprocessing checkpoints ──
 ENV IDM_VTON_PATH=/app/IDM-VTON
