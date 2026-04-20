@@ -81,8 +81,9 @@ def smooth_mask(mask: np.ndarray, kernel_size: int = 5) -> np.ndarray:
     # Open to remove small noise
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
     
-    # Slight blur for smooth edges
+    # Slight blur for smooth edges, then re-threshold to binary
     mask = cv2.GaussianBlur(mask, (5, 5), 0)
+    _, mask = cv2.threshold(mask, 127, 255, cv2.THRESH_BINARY)
     
     return mask
 

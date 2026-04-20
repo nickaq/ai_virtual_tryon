@@ -18,7 +18,7 @@ interface TryOnUploaderProps {
 export default function TryOnUploader({
     onImageSelect,
     label = "Upload Photo",
-    accept = "image/jpeg,image/png,image/jpg"
+    accept = "image/jpeg,image/png,image/jpg,image/webp"
 }: TryOnUploaderProps) {
     const [preview, setPreview] = useState<string | null>(null);
     const [isDragging, setIsDragging] = useState(false);

@@ -49,8 +49,13 @@ async def process_job(job: Job) -> bool:
         arms_mask = masks['arms']
         
         # Повторне визначення пози з маскою людини в якості резерву, якщо спочатку знайдено погано
-        if len(person_keypoints) < 2:
+        if len(person_keypoints) < 4:
             person_keypoints = pose_detector.detect_pose(person_image, person_mask)
+            # Re-segment with better keypoints to get accurate torso/arms masks
+            masks = segmentation.segment_person(person_image, person_keypoints)
+            person_mask = masks['person']
+            torso_mask = masks['torso']
+            arms_mask = masks['arms']
             
         # КРОК 4 — ОБРОБКА ОДЯГУ
         print(f"  КРОК 4: Обробка одягу...")

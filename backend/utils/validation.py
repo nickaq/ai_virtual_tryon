@@ -4,8 +4,8 @@ from typing import Optional
 from PIL import Image
 
 
-ALLOWED_FORMATS = {'.jpg', '.jpeg', '.png'}
-ALLOWED_MIME_TYPES = {'image/jpeg', 'image/png'}
+ALLOWED_FORMATS = {'.jpg', '.jpeg', '.png', '.webp'}
+ALLOWED_MIME_TYPES = {'image/jpeg', 'image/png', 'image/webp'}
 
 
 def validate_image_format(file_path: Path) -> bool:

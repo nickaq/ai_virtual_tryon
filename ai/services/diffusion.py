@@ -17,6 +17,8 @@ Hyperparameters:
   - num_inference_steps: 20 (denoising steps — balance of speed and quality)
 """
 import os
+import asyncio
+import functools
 import cv2
 import numpy as np
 from enum import Enum
@@ -162,6 +164,17 @@ NEGATIVE_PROMPT = (
 )
 
 
+def _resize_for_sd(image: Image.Image, target_size: int = 512) -> Image.Image:
+    """Resize image to SD-compatible resolution (multiple of 8), preserving aspect ratio."""
+    w, h = image.size
+    ratio = min(target_size / w, target_size / h)
+    new_w = int(w * ratio) // 8 * 8  # Round to multiple of 8
+    new_h = int(h * ratio) // 8 * 8
+    new_w = max(new_w, 64)
+    new_h = max(new_h, 64)
+    return image.resize((new_w, new_h), Image.LANCZOS)
+
+
 async def _refine_with_img2img(
     draft_composite: np.ndarray,
     prompt: str,
@@ -170,6 +183,7 @@ async def _refine_with_img2img(
     """
     Refine using img2img pipeline.
     Processes the ENTIRE image through the diffusion model.
+    Runs the blocking pipeline call in a thread executor.
     """
     pipeline = _get_img2img_pipeline()
     params = REFINEMENT_HYPERPARAMS["img2img"]
@@ -179,20 +193,33 @@ async def _refine_with_img2img(
         params["base_strength"] + params["strength_increment"] * (realism_level - 1)
     )
     
+    original_h, original_w = draft_composite.shape[:2]
     init_image = Image.fromarray(cv2.cvtColor(draft_composite, cv2.COLOR_BGR2RGB))
     
-    print(f"  [img2img] Strength: {strength:.2f}, Guidance: {params['guidance_scale']}")
+    # Resize to SD-compatible resolution to avoid OOM and ensure quality
+    sd_image = _resize_for_sd(init_image, target_size=512)
     
-    result_imgs = pipeline(
-        prompt=prompt,
-        negative_prompt=NEGATIVE_PROMPT,
-        image=init_image,
-        strength=strength,
-        guidance_scale=params["guidance_scale"],
-        num_inference_steps=params["num_inference_steps"]
-    ).images
+    print(f"  [img2img] Strength: {strength:.2f}, Guidance: {params['guidance_scale']}, "
+          f"SD resolution: {sd_image.size}")
     
-    return cv2.cvtColor(np.array(result_imgs[0]), cv2.COLOR_RGB2BGR)
+    # Run blocking pipeline in thread executor to avoid freezing event loop
+    loop = asyncio.get_running_loop()
+    result = await loop.run_in_executor(
+        None,
+        functools.partial(
+            pipeline,
+            prompt=prompt,
+            negative_prompt=NEGATIVE_PROMPT,
+            image=sd_image,
+            strength=strength,
+            guidance_scale=params["guidance_scale"],
+            num_inference_steps=params["num_inference_steps"]
+        )
+    )
+    
+    # Resize result back to original dimensions
+    result_pil = result.images[0].resize((original_w, original_h), Image.LANCZOS)
+    return cv2.cvtColor(np.array(result_pil), cv2.COLOR_RGB2BGR)
 
 
 async def _refine_with_inpainting(
@@ -205,6 +232,7 @@ async def _refine_with_inpainting(
     Refine using inpainting pipeline.
     Only the garment region (defined by garment_mask) is regenerated;
     the person's face, body, and background are preserved exactly.
+    Runs the blocking pipeline call in a thread executor.
     """
     pipeline = _get_inpainting_pipeline()
     params = REFINEMENT_HYPERPARAMS["inpainting"]
@@ -214,25 +242,38 @@ async def _refine_with_inpainting(
         params["base_strength"] + params["strength_increment"] * (realism_level - 1)
     )
     
+    original_h, original_w = draft_composite.shape[:2]
+    
     # Prepare PIL images
     init_image = Image.fromarray(cv2.cvtColor(draft_composite, cv2.COLOR_BGR2RGB))
-    
-    # Inpainting mask: white = region to regenerate (garment area)
     mask_image = Image.fromarray(garment_mask).convert("L")
     
-    print(f"  [inpainting] Strength: {strength:.2f}, Guidance: {params['guidance_scale']}")
+    # Resize to SD-compatible resolution
+    sd_image = _resize_for_sd(init_image, target_size=512)
+    sd_mask = mask_image.resize(sd_image.size, Image.NEAREST)
     
-    result_imgs = pipeline(
-        prompt=prompt,
-        negative_prompt=NEGATIVE_PROMPT,
-        image=init_image,
-        mask_image=mask_image,
-        strength=strength,
-        guidance_scale=params["guidance_scale"],
-        num_inference_steps=params["num_inference_steps"]
-    ).images
+    print(f"  [inpainting] Strength: {strength:.2f}, Guidance: {params['guidance_scale']}, "
+          f"SD resolution: {sd_image.size}")
     
-    return cv2.cvtColor(np.array(result_imgs[0]), cv2.COLOR_RGB2BGR)
+    # Run blocking pipeline in thread executor
+    loop = asyncio.get_running_loop()
+    result = await loop.run_in_executor(
+        None,
+        functools.partial(
+            pipeline,
+            prompt=prompt,
+            negative_prompt=NEGATIVE_PROMPT,
+            image=sd_image,
+            mask_image=sd_mask,
+            strength=strength,
+            guidance_scale=params["guidance_scale"],
+            num_inference_steps=params["num_inference_steps"]
+        )
+    )
+    
+    # Resize result back to original dimensions
+    result_pil = result.images[0].resize((original_w, original_h), Image.LANCZOS)
+    return cv2.cvtColor(np.array(result_pil), cv2.COLOR_RGB2BGR)
 
 
 async def refine_image_with_diffusion(

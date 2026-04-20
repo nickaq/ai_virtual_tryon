@@ -3,6 +3,12 @@ import cv2
 import numpy as np
 from typing import Dict, Tuple, Optional
 
+try:
+    from rembg import remove as rembg_remove
+    REMBG_AVAILABLE = True
+except ImportError:
+    REMBG_AVAILABLE = False
+
 from backend.models.job import ErrorCode
 from backend.utils.image_utils import smooth_mask, remove_small_components, get_bounding_box
 
@@ -17,22 +23,45 @@ class GarmentPrepError(Exception):
 
 def remove_background(image: np.ndarray, threshold: int = 240) -> Tuple[np.ndarray, np.ndarray]:
     """
-    Remove white/uniform background from garment image.
+    Remove background from garment image using rembg (AI-based) with
+    fallback to brightness threshold for white backgrounds.
     
     Args:
         image: Input garment image (BGR)
-        threshold: Brightness threshold for background detection
+        threshold: Brightness threshold for fallback background detection
         
     Returns:
-        Tuple of (image with transparent background, garment mask)
+        Tuple of (image with transparent background as RGBA, garment mask)
     """
-    # Convert to grayscale
+    if REMBG_AVAILABLE:
+        # Use rembg for robust background removal on any background
+        rgb_image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+        result = rembg_remove(rgb_image)  # Returns RGBA numpy array
+        
+        # Extract alpha channel as garment mask
+        if result.shape[2] == 4:
+            garment_mask = result[:, :, 3]
+        else:
+            # Unexpected output, fall through to threshold method
+            garment_mask = None
+        
+        if garment_mask is not None:
+            # Threshold to binary
+            _, garment_mask = cv2.threshold(garment_mask, 127, 255, cv2.THRESH_BINARY)
+            
+            # Clean up mask
+            garment_mask = smooth_mask(garment_mask, kernel_size=3)
+            garment_mask = remove_small_components(garment_mask, min_size=500)
+            
+            # Create RGBA in BGR order (OpenCV convention)
+            b, g, r = cv2.split(image)
+            rgba = cv2.merge([b, g, r, garment_mask])
+            
+            return rgba, garment_mask
+    
+    # Fallback: simple brightness threshold (works only for white backgrounds)
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    
-    # Threshold to find background (white/bright areas)
     _, bg_mask = cv2.threshold(gray, threshold, 255, cv2.THRESH_BINARY)
-    
-    # Invert to get garment mask
     garment_mask = cv2.bitwise_not(bg_mask)
     
     # Clean up mask
