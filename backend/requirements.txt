@@ -34,3 +34,15 @@ huggingface_hub==0.23.4
 accelerate
 scipy
 safetensors
+
+# IDM-VTON additional dependencies
+einops==0.7.0
+basicsr
+fvcore
+cloudpickle
+omegaconf
+pycocotools
+scikit-image
+matplotlib
+tqdm
+av
