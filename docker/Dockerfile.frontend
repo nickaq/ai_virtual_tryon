@@ -20,6 +20,8 @@ COPY frontend/ .
 # Build the application
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
+ARG AI_SERVICE_URL=http://backend:8000
+ENV AI_SERVICE_URL=${AI_SERVICE_URL}
 RUN npm run build
 
 # Production stage
