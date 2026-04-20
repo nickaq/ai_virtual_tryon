@@ -28,9 +28,9 @@ setuptools<70.0.0
 # IDM-VTON / SDXL diffusion pipeline
 # torch 2.2.2 is pre-installed in the base Docker image
 torchvision==0.17.2
-diffusers==0.27.2
-transformers==4.40.2
-huggingface_hub==0.23.4
+diffusers==0.25.0
+transformers==4.36.2
+huggingface_hub==0.25.0
 accelerate
 scipy
 safetensors
