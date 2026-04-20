@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     work_image_size: int = Field(default=1536, env="WORK_IMAGE_SIZE")
     
     # Quality control
-    quality_threshold: float = Field(default=0.7, env="QUALITY_THRESHOLD")
+    quality_threshold: float = Field(default=0.5, env="QUALITY_THRESHOLD")
     max_retries: int = Field(default=2, env="MAX_RETRIES")
     
     # Server

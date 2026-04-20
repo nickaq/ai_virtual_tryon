@@ -46,7 +46,7 @@ class Job(BaseModel):
     # Processing options
     generation_mode: str = Field(default="quality", description="Processing mode: 'fast' or 'quality'")
     warp_mode: str = Field(default="tps", description="Warping method: 'tps' (Thin-Plate Spline) or 'affine'")
-    refinement_mode: str = Field(default="img2img", description="Diffusion refinement: 'img2img' or 'inpainting'")
+    refinement_mode: str = Field(default="inpainting", description="Diffusion refinement: 'img2img' or 'inpainting'")
     max_retries: int = Field(default=2, description="Maximum retry attempts")
     preserve_face: bool = Field(default=True, description="Preserve face in result")
     preserve_background: bool = Field(default=True, description="Preserve background in result")

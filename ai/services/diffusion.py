@@ -54,16 +54,16 @@ class DiffusionAPIError(Exception):
 # ── Documented Hyperparameters ──────────────────────────────────────
 REFINEMENT_HYPERPARAMS = {
     "img2img": {
-        "base_strength": 0.25,          # Minimum denoising strength
-        "max_strength": 0.40,           # Maximum denoising strength
-        "strength_increment": 0.03,     # Increment per retry level
+        "base_strength": 0.15,          # Low strength to preserve face/body
+        "max_strength": 0.25,           # Maximum denoising strength
+        "strength_increment": 0.02,     # Increment per retry level
         "guidance_scale": 7.5,          # CFG scale
         "num_inference_steps": 20,      # Denoising steps
     },
     "inpainting": {
-        "base_strength": 0.50,          # Higher for inpainting (masked region only)
-        "max_strength": 0.75,           # More aggressive for masked refinement
-        "strength_increment": 0.05,     # Increment per retry level
+        "base_strength": 0.30,          # Moderate for inpainting (masked region only)
+        "max_strength": 0.50,           # Face/background not affected
+        "strength_increment": 0.04,     # Increment per retry level
         "guidance_scale": 7.5,          # CFG scale
         "num_inference_steps": 25,      # Slightly more steps for masked detail
     },

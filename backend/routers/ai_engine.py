@@ -95,7 +95,7 @@ async def submit_tryon(
     cloth_category: Optional[str] = Form(None),
     generation_mode: str = Form("quality"),
     warp_mode: str = Form("tps"),
-    refinement_mode: str = Form("img2img"),
+    refinement_mode: str = Form("inpainting"),
     pose_hint: Optional[str] = Form(None),
     mask_hint: Optional[str] = Form(None),
     preserve_face: bool = Form(True),
