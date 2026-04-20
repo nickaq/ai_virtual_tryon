@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 from typing import Dict, Tuple, Optional
 
-# Try to import mediapipe, but provide fallback if not available (Python 3.8 compatibility)
+# Try to import mediapipe, but provide fallback if not available
 try:
     import ssl
     try:
@@ -14,11 +14,12 @@ try:
         ssl._create_default_https_context = _create_unverified_https_context
 
     import mediapipe as mp
-    MEDIAPIPE_AVAILABLE = True
     mp_pose = mp.solutions.pose
-except ImportError:
+    MEDIAPIPE_AVAILABLE = True
+except (ImportError, AttributeError) as _mp_err:
     MEDIAPIPE_AVAILABLE = False
     mp_pose = None
+    print(f"Warning: MediaPipe not available ({_mp_err}), will use fallback keypoints")
 
 from backend.models.job import ErrorCode
 from backend.utils.image_utils import get_bounding_box

@@ -9,14 +9,13 @@ python-multipart==0.0.6
 httpx==0.26.0
 requests>=2.31.0
 
-# Image Processing
-opencv-contrib-python==4.11.0.86
+# Image Processing (headless for server/Docker — no GUI dependencies needed)
 opencv-python-headless==4.11.0.86
 Pillow>=10.0.0
 numpy>=1.21.0,<2.0.0
 
 # ML/AI
-mediapipe==0.9.0.1
+mediapipe==0.10.14
 rembg>=2.0.50
 onnxruntime
 
