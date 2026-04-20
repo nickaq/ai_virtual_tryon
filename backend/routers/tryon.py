@@ -70,7 +70,7 @@ async def _process_job_async(
         job_record = db.query(TryOnJob).filter(TryOnJob.id == job_id).first()
         if job_record:
             job_record.status = "DONE" if job.status == JobStatus.DONE else "FAILED"
-            job_record.resultPath = f"storage/results/{job.job_id}.png" if job.status == JobStatus.DONE else None
+            job_record.resultPath = f"/results/{job.job_id}.png" if job.status == JobStatus.DONE else None
             job_record.qualityScore = job.quality_score
             job_record.errorCode = job.error_code
             job_record.errorMessage = job.error_message
