@@ -21,6 +21,12 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Set working directory
 WORKDIR /app
 
+# Install cuDNN 9 for ONNX Runtime via pip (isolated from PyTorch's cuDNN 8)
+RUN pip install --no-cache-dir nvidia-cudnn-cu12==9.1.0.70
+
+# Add cuDNN 9 libs to LD_LIBRARY_PATH for ONNX Runtime
+ENV LD_LIBRARY_PATH="/opt/conda/lib/python3.10/site-packages/nvidia/cudnn/lib:${LD_LIBRARY_PATH:-/usr/local/cuda/lib64}"
+
 # ── 1. Install detectron2 + DensePose ──
 RUN pip install --no-cache-dir 'git+https://github.com/facebookresearch/detectron2.git'
 RUN pip install --no-cache-dir 'git+https://github.com/facebookresearch/detectron2@main#subdirectory=projects/DensePose'
@@ -56,7 +62,7 @@ RUN mkdir -p storage uploads products results artifacts logs models
 # Set environment variables
 ENV NVIDIA_VISIBLE_DEVICES=all
 ENV NVIDIA_DRIVER_CAPABILITIES=compute,utility
-ENV PYTHONPATH="/app:${IDM_VTON_PATH}:${PYTHONPATH}"
+ENV PYTHONPATH="/app:${IDM_VTON_PATH}"
 
 # Expose port
 EXPOSE 8000
